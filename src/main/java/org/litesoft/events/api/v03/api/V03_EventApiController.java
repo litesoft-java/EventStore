@@ -1,11 +1,11 @@
-package org.litesoft.events.api.v01.api;
+package org.litesoft.events.api.v03.api;
 
 import io.swagger.annotations.ApiParam;
+import org.litesoft.events.api.v03.model.CreateEvent;
+import org.litesoft.events.api.v03.model.PatchEvent;
+import org.litesoft.events.api.v03.model.ReturnedEvent;
+import org.litesoft.events.api.v03.services.V03_EventsStore;
 import org.litesoft.restish.support.AbstractRestishController;
-import org.litesoft.events.api.v01.model.CreateEvent;
-import org.litesoft.events.api.v01.model.ReturnedEvent;
-import org.litesoft.events.api.v01.model.UpdateEvent;
-import org.litesoft.events.api.v01.services.V01_EventsStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,15 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("api/v01")
+@RequestMapping("api/v03")
 @SuppressWarnings({"unused", "DefaultAnnotationParam", "MVCPathVariableInspection"})
-public class EventApiController extends AbstractRestishController<ReturnedEvent> implements EventApi {
+public class V03_EventApiController extends AbstractRestishController<ReturnedEvent> implements EventApi {
 
-    private static final Logger log = LoggerFactory.getLogger(EventApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(V03_EventApiController.class);
 
-    private final V01_EventsStore mStore;
+    private final V03_EventsStore mStore;
 
-    public EventApiController(V01_EventsStore pStore) {
+    public V03_EventApiController(V03_EventsStore pStore) {
         mStore = pStore;
     }
 
@@ -39,9 +39,9 @@ public class EventApiController extends AbstractRestishController<ReturnedEvent>
 
     @Override
     public ResponseEntity<ReturnedEvent> deleteEvent(@ApiParam(value = "", required = true)
-                                                     @PathVariable("id")
-                                                             String id) {
-        return process(() -> mStore.deleteEvent(authorizePair(), id));
+                                                     @PathVariable("updateToken")
+                                                             String updateToken) {
+        return process(() -> mStore.deleteEvent(authorizePair(), updateToken));
     }
 
     @Override
@@ -52,9 +52,13 @@ public class EventApiController extends AbstractRestishController<ReturnedEvent>
     }
 
     @Override
-    public ResponseEntity<ReturnedEvent> updateEvent(@ApiParam(value = "Updated Event", required = true)
+    public ResponseEntity<ReturnedEvent> updateEvent(@ApiParam(value = "Event changes to patch", required = true)
                                                      @Valid @RequestBody
-                                                             UpdateEvent body) {
-        return process(() -> mStore.updateEvent(authorizePair(), body));
+                                                             PatchEvent body,
+                                                     @ApiParam(value = "", required = true)
+                                                     @PathVariable("updateToken")
+                                                             String updateToken) {
+        return process(() -> mStore.updateEvent(authorizePair(), updateToken, body));
     }
+
 }

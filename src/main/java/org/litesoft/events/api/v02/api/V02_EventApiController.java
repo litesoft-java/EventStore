@@ -20,13 +20,13 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("api/v02")
 @SuppressWarnings({"unused", "DefaultAnnotationParam", "MVCPathVariableInspection"})
-public class EventApiController extends AbstractRestishController<ReturnedEvent> implements EventApi {
+public class V02_EventApiController extends AbstractRestishController<ReturnedEvent> implements EventApi {
 
-    private static final Logger log = LoggerFactory.getLogger(EventApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(V02_EventApiController.class);
 
     private final V02_EventsStore mStore;
 
-    public EventApiController(V02_EventsStore pStore) {
+    public V02_EventApiController(V02_EventsStore pStore) {
         mStore = pStore;
     }
 

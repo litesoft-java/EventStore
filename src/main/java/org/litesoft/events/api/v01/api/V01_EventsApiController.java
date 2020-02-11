@@ -19,15 +19,15 @@ import javax.validation.constraints.Min;
 @RestController
 @RequestMapping("api/v01")
 @SuppressWarnings({"unused", "DefaultAnnotationParam"})
-public class EventsApiController extends AbstractRestishController<EventsArray> implements EventsApi {
+public class V01_EventsApiController extends AbstractRestishController<EventsArray> implements EventsApi {
 
-    private static final Logger log = LoggerFactory.getLogger(EventsApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(V01_EventsApiController.class);
 
     private static final PageLimiter LIMITER = PageLimiter.withMin(0).withDefault(100).withMax(1000).build();
 
     private final V01_EventsStore mStore;
 
-    public EventsApiController(V01_EventsStore pStore) {
+    public V01_EventsApiController(V01_EventsStore pStore) {
         mStore = pStore;
     }
 
