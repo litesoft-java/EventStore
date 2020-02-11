@@ -37,6 +37,6 @@ public class EventsApiController extends AbstractRestishController<EventsArray> 
                                                     @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
                                                     @Valid @RequestParam(value = "limit", required = false)
                                                             Integer limit) {
-        return process(() -> EventsArray.from(mStore.latestEvents(user, LIMITER.normalize(limit))));
+        return process(() -> EventsArray.from(mStore.latestEvents(authorizePair(), user, LIMITER.normalize(limit))));
     }
 }

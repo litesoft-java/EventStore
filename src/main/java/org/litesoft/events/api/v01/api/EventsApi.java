@@ -22,6 +22,11 @@ public interface EventsApi {
     @RequestMapping(value = "/events",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<EventsArray> latestEvents(@ApiParam(value = "email address of the user you want to see Events for.  If not provided, then Events for all 'user's are returned.") @Valid @RequestParam(value = "user", required = false) String user, @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "") @Valid @RequestParam(value = "limit", required = false) Integer limit);
+    ResponseEntity<EventsArray> latestEvents(@ApiParam(value = "email address of the user you want to see Events for.  If not provided, then Events for all 'user's are returned.")
+                                             @Valid @RequestParam(value = "user", required = false)
+                                                     String user,
+                                             @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
+                                             @Valid @RequestParam(value = "limit", required = false)
+                                                     Integer limit);
 
 }

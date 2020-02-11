@@ -9,10 +9,15 @@ public class PageLimiter {
         this.mMax = mMax;
     }
 
+    public Integer optionallyNormalize(Integer pLimit) {
+        return (pLimit == null) ? null : commonNormalize(pLimit);
+    }
+
     public int normalize(Integer pLimit) {
-        if (pLimit == null) {
-            return mDefault;
-        }
+        return (pLimit == null) ? mDefault : commonNormalize(pLimit);
+    }
+
+    private int commonNormalize(int pLimit) {
         if (pLimit < mMin) {
             return mMin;
         }

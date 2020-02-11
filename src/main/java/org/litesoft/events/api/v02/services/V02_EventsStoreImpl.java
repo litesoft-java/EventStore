@@ -3,6 +3,7 @@ package org.litesoft.events.api.v02.services;
 import org.litesoft.events.api.v02.model.CreateEvent;
 import org.litesoft.events.api.v02.model.ReturnedEvent;
 import org.litesoft.events.api.v02.model.UpdateEvent;
+import org.litesoft.restish.support.AuthorizePair;
 import org.litesoft.restish.support.PageData;
 import org.springframework.stereotype.Service;
 
@@ -32,32 +33,32 @@ public class V02_EventsStoreImpl implements V02_EventsStore {
             .user("george@the.com").id("d290f1ee-6c54-4b02-90e6-d702748f0851");
 
     @Override
-    public PageData<ReturnedEvent> latestEvents(String pUser, int pLimit) {
+    public PageData<ReturnedEvent> latestEvents(AuthorizePair pAuthorizePair, String pUser, int pLimit) {
         return new PageData<>(E07, E06, E05, E04, E03, E02, E01);
     }
 
     @Override
-    public PageData<ReturnedEvent> nextEvents(String pNextToken, int pLimit) {
+    public PageData<ReturnedEvent> nextEvents(AuthorizePair pAuthorizePair, String pNextToken, Integer pLimit_inheritIfNull) {
         return new PageData<>();
     }
 
     @Override
-    public ReturnedEvent createEvent(CreateEvent pEvent) {
+    public ReturnedEvent createEvent(AuthorizePair pAuthorizePair, CreateEvent pEvent) {
         return null;
     }
 
     @Override
-    public ReturnedEvent deleteEvent(String pID) {
+    public ReturnedEvent deleteEvent(AuthorizePair pAuthorizePair, String pID) {
         return null;
     }
 
     @Override
-    public ReturnedEvent readEvent(String pID) {
+    public ReturnedEvent readEvent(AuthorizePair pAuthorizePair, String pID) {
         return null;
     }
 
     @Override
-    public ReturnedEvent updateEvent(UpdateEvent pEvent) {
+    public ReturnedEvent updateEvent(AuthorizePair pAuthorizePair, UpdateEvent pEvent) {
         return null;
     }
 }

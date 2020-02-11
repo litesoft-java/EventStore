@@ -34,27 +34,27 @@ public class EventApiController extends AbstractRestishController<ReturnedEvent>
     public ResponseEntity<ReturnedEvent> createEvent(@ApiParam(value = "Event to create", required = true)
                                                      @Valid @RequestBody
                                                              CreateEvent body) {
-        return process(HttpStatus.CREATED, () -> mStore.createEvent(body));
+        return process(HttpStatus.CREATED, () -> mStore.createEvent(authorizePair(), body));
     }
 
     @Override
     public ResponseEntity<ReturnedEvent> deleteEvent(@ApiParam(value = "", required = true)
                                                      @PathVariable("id")
                                                              String id) {
-        return process(() -> mStore.deleteEvent(id));
+        return process(() -> mStore.deleteEvent(authorizePair(), id));
     }
 
     @Override
     public ResponseEntity<ReturnedEvent> readEvent(@ApiParam(value = "", required = true)
                                                    @PathVariable("id")
                                                            String id) {
-        return process(() -> mStore.readEvent(id));
+        return process(() -> mStore.readEvent(authorizePair(), id));
     }
 
     @Override
     public ResponseEntity<ReturnedEvent> updateEvent(@ApiParam(value = "Updated Event", required = true)
                                                      @Valid @RequestBody
                                                              UpdateEvent body) {
-        return process(() -> mStore.updateEvent(body));
+        return process(() -> mStore.updateEvent(authorizePair(), body));
     }
 }

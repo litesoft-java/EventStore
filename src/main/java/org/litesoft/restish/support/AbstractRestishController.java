@@ -8,6 +8,10 @@ import org.springframework.http.ResponseEntity;
 import java.util.function.Supplier;
 
 public class AbstractRestishController<T> {
+    protected AuthorizePair authorizePair() {
+        return null; // TODO: XXX
+    }
+
     protected ResponseEntity<T> process(Supplier<T> pSuppler) {
         return process(HttpStatus.OK, pSuppler);
     }

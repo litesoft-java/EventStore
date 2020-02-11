@@ -38,6 +38,6 @@ public class EventsNextPageApiController extends AbstractRestishController<PageE
                                                  @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
                                                  @Valid @RequestParam(value = "limit", required = false)
                                                          Integer limit) {
-        return process(() -> PageEvents.from(mStore.latestEvents(nextToken, LIMITER.normalize(limit))));
+        return process(() -> PageEvents.from(mStore.latestEvents(authorizePair(), nextToken, LIMITER.optionallyNormalize(limit))));
     }
 }
