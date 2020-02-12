@@ -3,11 +3,19 @@ package org.litesoft.restish.support;
 import org.litesoft.accessors.Require;
 
 public class AuthorizePair {
+    private final boolean localHost;
     private final String userEmail, secretToken;
 
-    private AuthorizePair(String userEmail, String secretToken) {
+    public static final AuthorizePair LOCALHOST = new AuthorizePair(true, null, null);
+
+    private AuthorizePair(boolean localHost, String userEmail, String secretToken) {
+        this.localHost = localHost;
         this.userEmail = userEmail;
         this.secretToken = secretToken;
+    }
+
+    public boolean isLocalHost() {
+        return localHost;
     }
 
     public String getUserEmail() {
@@ -16,6 +24,12 @@ public class AuthorizePair {
 
     public String getSecretToken() {
         return secretToken;
+    }
+
+    @Override
+    public String toString() {
+        return isLocalHost() ? "AuthorizePair(localHost)" :
+                ("AuthorizePair(userEmail='" + userEmail + ", 'secretToken='" + secretToken + "')");
     }
 
     public static class Builder {
@@ -32,7 +46,7 @@ public class AuthorizePair {
         }
 
         public AuthorizePair build() {
-            return new AuthorizePair(
+            return new AuthorizePair(false,
                     Require.significant("UserEmail", userEmail),
                     Require.significant("SecretToken", secretToken)
             );

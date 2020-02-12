@@ -1,0 +1,9 @@
+---
+applications:
+- instances: 1
+  name: EventStore
+  memory: 1G
+  path: target/event-store-1.0.0.jar
+  disk_quota: 256M
+  env:
+    spring.profiles.active: cloud

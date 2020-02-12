@@ -4,6 +4,7 @@ import org.litesoft.events.api.v01.model.CreateEvent;
 import org.litesoft.events.api.v01.model.ReturnedEvent;
 import org.litesoft.events.api.v01.model.UpdateEvent;
 import org.litesoft.restish.support.AuthorizePair;
+import org.litesoft.restish.support.CurrentAuthorization;
 import org.litesoft.restish.support.PageData;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,8 @@ public class V01_EventsStoreImpl implements V01_EventsStore {
 
     @Override
     public PageData<ReturnedEvent> latestEvents(AuthorizePair pAuthorizePair, String pUser, int pLimit) {
+        AuthorizePair pair = CurrentAuthorization.get();
+        System.out.println("V01_EventsStoreImpl.latestEvents: " + pair);
         return new PageData<>(E07, E06, E05, E04, E03, E02, E01);
     }
 
