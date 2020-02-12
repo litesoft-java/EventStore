@@ -4,7 +4,6 @@ import org.litesoft.events.api.v01.model.CreateEvent;
 import org.litesoft.events.api.v01.model.ReturnedEvent;
 import org.litesoft.events.api.v01.model.UpdateEvent;
 import org.litesoft.restish.support.PageData;
-import org.litesoft.restish.support.auth.Authorization;
 import org.litesoft.restish.support.auth.AuthorizePair;
 import org.springframework.stereotype.Service;
 

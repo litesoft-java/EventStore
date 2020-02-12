@@ -1,4 +1,4 @@
-package org.litesoft.exceptions;
+package org.litesoft.restish.support.exceptions;
 
 import org.litesoft.HttpStatusAccessor;
 

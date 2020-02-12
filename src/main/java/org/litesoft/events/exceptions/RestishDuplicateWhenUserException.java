@@ -1,6 +1,6 @@
 package org.litesoft.events.exceptions;
 
-import org.litesoft.exceptions.RestishException;
+import org.litesoft.restish.support.exceptions.RestishException;
 
 public class RestishDuplicateWhenUserException extends RestishException {
     public RestishDuplicateWhenUserException() {

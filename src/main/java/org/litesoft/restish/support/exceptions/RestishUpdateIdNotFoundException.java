@@ -1,6 +1,4 @@
-package org.litesoft.events.exceptions;
-
-import org.litesoft.exceptions.RestishException;
+package org.litesoft.restish.support.exceptions;
 
 public class RestishUpdateIdNotFoundException extends RestishException {
     public RestishUpdateIdNotFoundException() {

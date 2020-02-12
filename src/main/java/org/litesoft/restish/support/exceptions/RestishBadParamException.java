@@ -1,6 +1,4 @@
-package org.litesoft.events.exceptions;
-
-import org.litesoft.exceptions.RestishException;
+package org.litesoft.restish.support.exceptions;
 
 public class RestishBadParamException extends RestishException {
     public RestishBadParamException() {
