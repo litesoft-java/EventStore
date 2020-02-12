@@ -1,11 +1,12 @@
 package org.litesoft.events.api.v02.api;
 
 import io.swagger.annotations.ApiParam;
-import org.litesoft.restish.support.AbstractRestishController;
 import org.litesoft.events.api.v02.model.CreateEvent;
 import org.litesoft.events.api.v02.model.ReturnedEvent;
 import org.litesoft.events.api.v02.model.UpdateEvent;
 import org.litesoft.events.api.v02.services.V02_EventsStore;
+import org.litesoft.restish.support.AbstractRestishController;
+import org.litesoft.restish.support.auth.Authorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,8 @@ public class V02_EventApiController extends AbstractRestishController<ReturnedEv
 
     private final V02_EventsStore mStore;
 
-    public V02_EventApiController(V02_EventsStore pStore) {
+    public V02_EventApiController(Authorization pAuthorization, V02_EventsStore pStore) {
+        super(pAuthorization);
         mStore = pStore;
     }
 

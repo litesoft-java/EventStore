@@ -1,4 +1,4 @@
-package org.litesoft.restish.support;
+package org.litesoft.restish.support.auth;
 
 import org.litesoft.accessors.Require;
 
@@ -18,7 +18,7 @@ public abstract class AbstractApiAuthFilter implements javax.servlet.Filter {
         System.out.println(mClassName + " created");
     }
 
-    protected abstract void grabAuth(String auth);
+    protected abstract void grabAuth(String auth) throws BadAuthorizationFormException;
 
     protected abstract void clearAuth();
 
@@ -66,6 +66,10 @@ public abstract class AbstractApiAuthFilter implements javax.servlet.Filter {
         }
         try {
             grabAuth(auth);
+        } catch (BadAuthorizationFormException e) {
+            System.out.println(e.getMessage());
+            replyBadAuthorizationForm(response);
+            return;
         } catch (RuntimeException e) {
             e.printStackTrace();
             replyBadAuthorizationForm(response);
@@ -106,5 +110,11 @@ public abstract class AbstractApiAuthFilter implements javax.servlet.Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {
+    }
+
+    protected static class BadAuthorizationFormException extends Exception {
+        public BadAuthorizationFormException(String auth) {
+            super("Bad 'Authorization': '" + auth + "'");
+        }
     }
 }

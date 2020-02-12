@@ -3,8 +3,8 @@ package org.litesoft.events.api.v03.services;
 import org.litesoft.events.api.v03.model.CreateEvent;
 import org.litesoft.events.api.v03.model.PatchEvent;
 import org.litesoft.events.api.v03.model.ReturnedEvent;
-import org.litesoft.restish.support.AuthorizePair;
 import org.litesoft.restish.support.PageData;
+import org.litesoft.restish.support.auth.AuthorizePair;
 
 public interface V03_EventsStore {
     PageData<ReturnedEvent> latestEvents(AuthorizePair pAuthorizePair, String pUser, int pLimit);

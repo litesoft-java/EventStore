@@ -1,10 +1,10 @@
 package org.litesoft.events.api.v03.services;
 
 import org.litesoft.events.api.v03.model.CreateEvent;
-import org.litesoft.events.api.v03.model.ReturnedEvent;
 import org.litesoft.events.api.v03.model.PatchEvent;
-import org.litesoft.restish.support.AuthorizePair;
+import org.litesoft.events.api.v03.model.ReturnedEvent;
 import org.litesoft.restish.support.PageData;
+import org.litesoft.restish.support.auth.AuthorizePair;
 import org.springframework.stereotype.Service;
 
 @Service

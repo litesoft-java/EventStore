@@ -5,6 +5,7 @@ import org.litesoft.events.api.v01.model.EventsArray;
 import org.litesoft.events.api.v01.services.V01_EventsStore;
 import org.litesoft.restish.support.AbstractRestishController;
 import org.litesoft.restish.support.PageLimiter;
+import org.litesoft.restish.support.auth.Authorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,8 @@ public class V01_EventsApiController extends AbstractRestishController<EventsArr
 
     private final V01_EventsStore mStore;
 
-    public V01_EventsApiController(V01_EventsStore pStore) {
+    public V01_EventsApiController(Authorization pAuthorization, V01_EventsStore pStore) {
+        super(pAuthorization);
         mStore = pStore;
     }
 

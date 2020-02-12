@@ -1,6 +1,8 @@
 package org.litesoft.restish.support;
 
 import org.litesoft.HttpStatusAccessor;
+import org.litesoft.restish.support.auth.Authorization;
+import org.litesoft.restish.support.auth.AuthorizePair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,8 +10,14 @@ import org.springframework.http.ResponseEntity;
 import java.util.function.Supplier;
 
 public class AbstractRestishController<T> {
+    private final Authorization mAuthorization;
+
+    public AbstractRestishController(Authorization pAuthorization) {
+        mAuthorization = pAuthorization;
+    }
+
     protected AuthorizePair authorizePair() {
-        return null; // TODO: XXX
+        return mAuthorization.get();
     }
 
     protected ResponseEntity<T> process(Supplier<T> pSuppler) {

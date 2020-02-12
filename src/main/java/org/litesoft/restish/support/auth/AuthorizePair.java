@@ -1,4 +1,4 @@
-package org.litesoft.restish.support;
+package org.litesoft.restish.support.auth;
 
 import org.litesoft.accessors.Require;
 

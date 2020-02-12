@@ -5,6 +5,7 @@ import org.litesoft.events.api.v02.model.PageEvents;
 import org.litesoft.events.api.v02.services.V02_EventsStore;
 import org.litesoft.restish.support.AbstractRestishController;
 import org.litesoft.restish.support.PageLimiter;
+import org.litesoft.restish.support.auth.Authorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,8 @@ public class V02_EventsNextPageApiController extends AbstractRestishController<P
 
     private final V02_EventsStore mStore;
 
-    public V02_EventsNextPageApiController(V02_EventsStore pStore) {
+    public V02_EventsNextPageApiController(Authorization pAuthorization, V02_EventsStore pStore) {
+        super(pAuthorization);
         mStore = pStore;
     }
 

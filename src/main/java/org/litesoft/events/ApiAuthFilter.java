@@ -1,8 +1,8 @@
 package org.litesoft.events;
 
-import org.litesoft.restish.support.AbstractApiAuthFilter;
-import org.litesoft.restish.support.AuthorizePair;
-import org.litesoft.restish.support.CurrentAuthorization;
+import org.litesoft.restish.support.auth.AbstractApiAuthFilter;
+import org.litesoft.restish.support.auth.Authorization;
+import org.litesoft.restish.support.auth.AuthorizePair;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +11,16 @@ import org.springframework.stereotype.Component;
 public class ApiAuthFilter extends AbstractApiAuthFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
+    private final Authorization mAuthorization;
+
+    public ApiAuthFilter(Authorization pAuthorization) {
+        mAuthorization = pAuthorization;
+    }
+
     @Override
-    protected void grabAuth(String auth) {
+    protected void grabAuth(String auth) throws BadAuthorizationFormException {
         if (auth == null) {
-            CurrentAuthorization.set(AuthorizePair.LOCALHOST);
+            mAuthorization.set(AuthorizePair.LOCALHOST);
             return;
         }
         if (auth.startsWith(BEARER_PREFIX)) {
@@ -24,16 +30,16 @@ public class ApiAuthFilter extends AbstractApiAuthFilter {
                 String secretToken = fields.substring(0, slashAt).trim();
                 String userEmail = fields.substring(slashAt + 1).trim().toLowerCase();
                 if (!secretToken.isEmpty() && !userEmail.isEmpty()) {
-                    CurrentAuthorization.set(AuthorizePair.withSecretToken(secretToken).withUserEmail(userEmail).build());
+                    mAuthorization.set(AuthorizePair.withSecretToken(secretToken).withUserEmail(userEmail).build());
                     return;
                 }
             }
         }
-        throw new RuntimeException("Bad 'Authorization': '" + auth + "'");
+        throw new BadAuthorizationFormException(auth);
     }
 
     @Override
     protected void clearAuth() {
-        CurrentAuthorization.clear();
+        mAuthorization.clear();
     }
 }
