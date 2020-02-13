@@ -1,6 +1,10 @@
 .DS_Store
+out/
 .idea
 target
+*.iml
+
+/dependencies.txt
 
 # Compiled class file
 *.class
