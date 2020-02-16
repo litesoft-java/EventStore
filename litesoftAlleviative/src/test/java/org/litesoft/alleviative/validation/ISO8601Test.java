@@ -107,6 +107,7 @@ public class ISO8601Test {
                  pField + " value must not be greater than (" + pExpected + "), but was: " + pActual );
   }
 
+  @SuppressWarnings("SameParameterValue")
   private void assertRangeFromError( String pISO8601, String pField, int pExpected, int pActual ) {
     assertError( ISO8601.validateRequired( pISO8601 ),
                  pField + " value must be at least (" + pExpected + "), but was: " + pActual );
@@ -216,6 +217,7 @@ public class ISO8601Test {
     assertEquals( "Error but...", pExpectedError, pResult.getError() );
   }
 
+  @SuppressWarnings("unused")
   private void assertError( ValidationResult<String> pResult, String pExpectedError ) {
     if ( !pResult.hasError() ) {
       fail( "No Error, ISO8601 (" + pResult.getValue() + "), Expected error was: " + pExpectedError );
