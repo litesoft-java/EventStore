@@ -1,5 +1,6 @@
 package org.litesoft.alleviative.beans;
 
+@SuppressWarnings("unused")
 public class IntRange {
   private final int mFrom, mThru;
 

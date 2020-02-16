@@ -13,7 +13,130 @@ import org.litesoft.alleviative.beans.Months;
  * <li> ..........1.........2........ </li>
  * <li> ....4..7..0..3..6..90.2345678 </li>
  */
+@SuppressWarnings("unused")
 public class ISO8601 {
+  public static final String EXAMPLE = "2020-02-29T23:59:59.123456789Z";
+
+  private final String mISO8601str, mError;
+  private final Resolution mResolution;
+
+  private ISO8601( String pISO8601str, Resolution pResolution, String pError ) {
+    mISO8601str = pISO8601str;
+    mResolution = pResolution;
+    mError = pError;
+  }
+
+  public boolean hasError() {
+    return (mError != null);
+  }
+
+  public String getError() {
+    return mError;
+  }
+
+  public String getISO8601() {
+    return mISO8601str;
+  }
+
+  public Resolution getResolution() {
+    return mResolution;
+  }
+
+  @SuppressWarnings("unused")
+  public static ISO8601 validateOptional( String pISO8601str ) {
+    String zISO8601str = Significant.orNull( pISO8601str );
+    return (zISO8601str != null) ? validate( zISO8601str.toUpperCase() ) :
+           new ISO8601( null, Resolution.None, null );
+  }
+
+  public static ISO8601 validateRequired( String pISO8601str ) {
+    String zISO8601str = Significant.orNull( pISO8601str );
+    return (zISO8601str != null) ? validate( zISO8601str.toUpperCase() ) :
+           new ISO8601( null, Resolution.None, "is Required" );
+  }
+
+  private static ISO8601 validate( String pISO8601str ) {
+    int zLength = pISO8601str.length();
+    if ( zLength < 5 ) {
+      return new ISO8601( pISO8601str, Resolution.None, "too short" );
+    }
+    pISO8601str = pISO8601str.toUpperCase();
+    if ( 'Z' != pISO8601str.charAt( zLength - 1 ) ) {
+      return new ISO8601( pISO8601str, Resolution.None, "no 'Z' terminator" );
+    }
+    if ( EXAMPLE.length() < zLength ) {
+      return new ISO8601( pISO8601str, Resolution.None, "too long" );
+    }
+    zLength--; // ignore the 'Z'
+    Resolution[] zResolutions = Resolution.values();
+    for ( int i = 1; i < zResolutions.length; i++ ) { // Skip 'None'
+      Resolution zRes = zResolutions[i];
+      int zResLength = zRes.getLength();
+      if ( zLength < zResLength ) {
+        if ( !zRes.isPadable() ) {
+          return new ISO8601( pISO8601str, Resolution.None, zRes.name() + " field incomplete, (too short): " + pISO8601str );
+        }
+        StringBuilder sb = new StringBuilder( zResLength + 1 ).append( pISO8601str );
+        sb.setCharAt( zLength++, '0' ); // Convert the 'Z' to a '0'
+        for ( ; zLength < zResLength; zLength++ ) {
+          sb.append( '0' );
+        }
+        pISO8601str = sb.append( 'Z' ).toString(); // Add the 'Z' back!
+      }
+      String zError = zRes.checkAcceptability( pISO8601str );
+      if ( zError != null ) {
+        return new ISO8601( pISO8601str, Resolution.None, zError );
+      }
+      if ( zResLength == zLength ) {
+        return new ISO8601( pISO8601str, zRes, null );
+      }
+    }
+    throw new IllegalStateException( "Should not have reached this point w/ '" + pISO8601str + "'" );
+  }
+
+  public ValidationResult<String> toYear() {
+    return toRes( Resolution.Year );
+  }
+
+  public ValidationResult<String> toMonth() {
+    return toRes( Resolution.Month );
+  }
+
+  public ValidationResult<String> toDay() {
+    return toRes( Resolution.Day );
+  }
+
+  public ValidationResult<String> toHour() {
+    return toRes( Resolution.Hour );
+  }
+
+  public ValidationResult<String> toMin() {
+    return toRes( Resolution.Min );
+  }
+
+  public ValidationResult<String> toSecond() {
+    return toRes( Resolution.Second );
+  }
+
+  public ValidationResult<String> toFracSecs3() {
+    return toRes( Resolution.FracSecs3 );
+  }
+
+  public ValidationResult<String> toFracSecs6() {
+    return toRes( Resolution.FracSecs6 );
+  }
+
+  public ValidationResult<String> toFracSecs9() {
+    return toRes( Resolution.FracSecs9 );
+  }
+
+  ValidationResult<String> toRes( Resolution pTarget ) {
+    if ( mError != null ) {
+      return ValidationResult.withValue( mISO8601str ).error( mError );
+    }
+    return ValidationResult.withValue( mResolution.adjustTo( mISO8601str, pTarget ) ).ok();
+  }
+
   @SuppressWarnings("unused")
   public enum Resolution {
     None {
@@ -26,12 +149,22 @@ public class ISO8601 {
       public int getValue( String pISO8601str ) {
         throw new UnsupportedOperationException( "'None' has no Value" );
       }
-    },
-    Year( 4 ),
-    Month( '-', 7, new IntRange( 1, 12 ) ),
-    Day( '-', 10, new IntRange( 1, 31 ) ) {
+
       @Override
-      protected String checkAboveNominalRange( String pISO8601str, int pDay, int pNominalThruLimit ) {
+      String adjustTo( String pISO8601str, Resolution pTargetRes ) {
+        throw new UnsupportedOperationException( "'None' can not be adjusted to: " + pTargetRes );
+      }
+
+      @Override
+      void shrink( StringBuilder sb ) {
+        throw new UnsupportedOperationException( "'None' can not be an adjusted to target" );
+      }
+    },
+    Year( 0, 4 ),
+    Month( 4, '-', 7, new IntRange( 1, 12 ) ),
+    Day( 7, '-', 10, new IntRange( 1, 31 ) ) {
+      @Override
+      protected String checkRangeThru( String pISO8601str, int pDay, int pNominalThruLimit ) {
         int zMonth = Month.getValue( pISO8601str );
         if ( zMonth != 2 ) {
           int zMaxDays = Months.is31dayMonth( zMonth ) ? 31 : 30;
@@ -45,50 +178,78 @@ public class ISO8601 {
                Months.getMonthDataForMonth( zMonth ).get3Code() + " " + zYear + " only has " + zMaxDay + " days, but found: " + pDay;
       }
     },
-    Hour( 'T', 13, new IntRange( 0, 23 ) ),
-    Min( ':', 16, new IntRange( 0, 59 ) ),
-    Second( ':', 19, new IntRange( 0, 60 ) ), // Leap Sec
-    FracSecs3( '.', 23, true ),
-    FracSecs6( 26, true ),
-    FracSecs9( 29, true );
+    Hour( 10, 'T', 13, new IntRange( 0, 23 ) ),
+    Min( 13, ':', 16, new IntRange( 0, 59 ) ),
+    Second( 16, ':', 19, new IntRange( 0, 59 ) ) {
+      @Override
+      protected String checkRangeThru( String pISO8601str, int pSecond, int pNominalThruLimit ) {
+        if ( pSecond < 60 ) {
+          return null;
+        }
+        // Check Leap Secs
+        String zHrAndMin = pISO8601str.substring( Hour.mFrom, Min.mLength );
+        if ( !"T23:59".equals( zHrAndMin ) ) { // Not Last Minute
+          return super.checkRangeThru( pISO8601str, pSecond, pNominalThruLimit );
+        }
+        int zMonth = Month.getValue( pISO8601str );
+        if ( (zMonth != 6) && (zMonth != 12) ) { // Not appropriate Months
+          return super.checkRangeThru( pISO8601str, pSecond, pNominalThruLimit );
+        }
+        int zDay = Day.getValue( pISO8601str );
+        if ( zDay != Months.getMonthDataForMonth( zMonth ).getNominalDays() ) { // Not Last Day
+          return super.checkRangeThru( pISO8601str, pSecond, pNominalThruLimit );
+        }
+        if ( pSecond == 60 ) {
+          return null; // Leap Second OK!
+        }
+        return zDay + " " + Months.getMonthDataForMonth( zMonth ).get3Code() +
+               " in the last minute (23:59) may have a leap sec (23:59:60), but definitely can't have: " + pSecond;
+      }
+    },
+    FracSecs3( 19, '.', 23, true ),
+    FracSecs6( 23, 26, true ),
+    FracSecs9( 26, 29, true );
 
     private final int mFrom;
-    private final Integer mLength;
+    private final int mLength;
     private final Character mPrefixChar;
     private final boolean mPadable;
     private final IntRange mRange;
 
-    Resolution( Integer pLength, Character pPrefixChar, boolean pPadable, IntRange pRange ) {
+    Resolution( int pFrom, int pLength, Character pPrefixChar, boolean pPadable, IntRange pRange ) {
+      mFrom = pFrom;
       mLength = pLength;
       mPrefixChar = pPrefixChar;
       mPadable = pPadable;
       mRange = pRange;
-      int zOrdinal = ordinal();
-      int zFrom = 0;
-      if ( zOrdinal > 1 ) { // All BUT None & Year
-        zFrom = Resolution.values()[zOrdinal - 1].mLength;
-      }
-      mFrom = zFrom;
     }
 
     Resolution() {
-      this( null, null, false, null );
+      this( -1, -1, null, false, null );
     }
 
-    Resolution( int pLength ) {
-      this( pLength, null, false, null );
+    Resolution( int pFrom, int pLength ) {
+      this( pFrom, pLength, null, false, null );
     }
 
-    Resolution( char pPrefixChar, int pLength, IntRange pRange ) {
-      this( pLength, pPrefixChar, false, pRange );
+    Resolution( int pFrom, char pPrefixChar, int pLength, IntRange pRange ) {
+      this( pFrom, pLength, pPrefixChar, false, pRange );
     }
 
-    Resolution( char pPrefixChar, int pLength, boolean pPadable ) {
-      this( pLength, pPrefixChar, pPadable, null );
+    Resolution( int pFrom, char pPrefixChar, int pLength, boolean pPadable ) {
+      this( pFrom, pLength, pPrefixChar, pPadable, null );
     }
 
-    Resolution( int pLength, boolean pPadable ) {
-      this( pLength, null, pPadable, null );
+    Resolution( int pFrom, int pLength, boolean pPadable ) {
+      this( pFrom, pLength, null, pPadable, null );
+    }
+
+    private boolean hasRange() {
+      return (mRange != null);
+    }
+
+    public boolean hasPrefixChar() {
+      return (mPrefixChar != null);
     }
 
     public Character getPrefixChar() {
@@ -125,90 +286,56 @@ public class ISO8601 {
         }
         zValue = (zValue * 10) + (c - '0');
       }
-      if ( mRange == null ) { // Left to Right!
+      if ( !hasRange() ) {
         return null;
       }
       if ( zValue < mRange.getFrom() ) {
         return name() + " value must be at least (" + mRange.getFrom() + "), but was: " + zValue;
       }
-      return checkAboveNominalRange( pISO8601str, zValue, mRange.getThru() );
+      return checkRangeThru( pISO8601str, zValue, mRange.getThru() );
     }
 
-    protected String checkAboveNominalRange( String pISO8601str, int pValue, int pNominalThruLimit ) {
-      return (pValue <= pNominalThruLimit) ? null : (name() + " value must be not be greater than (" + pNominalThruLimit + "), but was: " + pValue);
+    protected String checkRangeThru( String pISO8601str, int pValue, int pNominalThruLimit ) {
+      return (pValue <= pNominalThruLimit) ? null : (name() + " value must not be greater than (" + pNominalThruLimit + "), but was: " + pValue);
     }
 
     String adjustTo( String pISO8601str, Resolution pTargetRes ) {
-      // XXX
-      return null;
-    }
-  }
-
-  private final String mISO8601str, mError;
-  private final Resolution mResolution;
-
-  private ISO8601( String pISO8601str, Resolution pResolution, String pError ) {
-    mISO8601str = pISO8601str;
-    mResolution = pResolution;
-    mError = pError;
-  }
-
-  @SuppressWarnings("unused")
-  public static ISO8601 validateOptional( String pISO8601str ) {
-    String zISO8601str = Significant.orNull( pISO8601str );
-    return (zISO8601str != null) ? validate( zISO8601str.toUpperCase() ) :
-           new ISO8601( null, Resolution.None, null );
-  }
-
-  public static ISO8601 validateRequired( String pISO8601str ) {
-    String zISO8601str = Significant.orNull( pISO8601str );
-    return (zISO8601str != null) ? validate( zISO8601str.toUpperCase() ) :
-           new ISO8601( null, Resolution.None, "is Required" );
-  }
-
-  private static ISO8601 validate( String pISO8601str ) {
-    int zLength = pISO8601str.length();
-    if ( zLength < 5 ) {
-      return new ISO8601( pISO8601str, Resolution.None, "Too short" );
-    }
-    pISO8601str = pISO8601str.toUpperCase();
-    if ( 'Z' != pISO8601str.charAt( zLength - 1 ) ) {
-      return new ISO8601( pISO8601str, Resolution.None, "no 'Z' terminator" );
-    }
-    if ( 30 < zLength ) {
-      return new ISO8601( pISO8601str, Resolution.None, "Too long" );
-    }
-    zLength--; // ignore the 'Z'
-    Resolution[] zResolutions = Resolution.values();
-    for ( int i = 1; i < zResolutions.length; i++ ) { // Skip 'None'
-      Resolution zRes = zResolutions[i];
-      int zResLength = zRes.getLength();
-      if ( zLength < zResLength ) {
-        if ( !zRes.isPadable() ) {
-          return new ISO8601( pISO8601str, Resolution.None, zRes.name() + " field incomplete,  (too short): " + pISO8601str );
-        }
-        StringBuilder sb = new StringBuilder( zResLength + 1 ).append( pISO8601str );
-        sb.setCharAt( zLength++, '0' ); // Convert the 'Z' to a '0'
-        for ( ; zLength < zResLength; zLength++ ) {
-          sb.append( '0' );
-        }
-        pISO8601str = sb.append( 'Z' ).toString(); // Add the 'Z' back!
+      if ( this == pTargetRes ) {
+        return pISO8601str;
       }
-      String zError = zRes.checkAcceptability( pISO8601str );
-      if ( zError != null ) {
-        return new ISO8601( pISO8601str, Resolution.None, zError );
+      int zCurrentOrd = this.ordinal();
+      int zTargetOrd = pTargetRes.ordinal();
+      StringBuilder sb = new StringBuilder().append( pISO8601str ); // with 'Z'
+      if ( zTargetOrd < zCurrentOrd ) {
+        pTargetRes.shrink( sb );
+      } else { // Target Longer (Can't be None)
+        sb.setLength( getLength() );
+        getByOrdinal( zCurrentOrd + 1 ).stretch( sb, pTargetRes );
       }
-      if ( zResLength == zLength ) {
-        return new ISO8601( pISO8601str, zRes, null );
+      return sb.append( 'Z' ).toString();
+    }
+
+    void stretch( StringBuilder sb, Resolution pTargetRes ) {
+      if ( hasPrefixChar() ) {
+        sb.append( getPrefixChar() );
+      }
+      int zValue = hasRange() ? mRange.getFrom() : 0;
+      String zAdd = Integer.toString( zValue );
+      for ( int z0sToAdd = (getLength() - sb.length()) - zAdd.length(); z0sToAdd > 0; z0sToAdd-- ) {
+        sb.append( '0' );
+      }
+      sb.append( zAdd );
+      if ( this != pTargetRes ) {
+        getByOrdinal( ordinal() + 1 ).stretch( sb, pTargetRes );
       }
     }
-    throw new IllegalStateException( "Should not have reached this point w/ '" + pISO8601str + "'" );
-  }
 
-  public ValidationResult<String> toMin() {
-    if ( mError != null ) {
-      return ValidationResult.withValue( mISO8601str ).error( mError );
+    void shrink( StringBuilder sb ) {
+      sb.setLength( getLength() );
     }
-    return ValidationResult.withValue( mResolution.adjustTo( mISO8601str, Resolution.Min ) ).ok();
+
+    private static Resolution getByOrdinal( int pOrdinal ) {
+      return Resolution.values()[pOrdinal];
+    }
   }
 }
