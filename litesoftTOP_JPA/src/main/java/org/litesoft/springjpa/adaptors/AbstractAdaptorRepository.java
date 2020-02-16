@@ -9,19 +9,15 @@ import java.util.function.Function;
 import org.hibernate.exception.ConstraintViolationException;
 import org.litesoft.codecs.text.HexUTF8v1;
 import org.litesoft.codecs.text.StringCodec;
-import org.litesoft.persisted.IPersistedObject;
-import org.litesoft.persisted.IPersistedObjectRepository;
-import org.litesoft.persisted.NextPageToken;
-import org.litesoft.persisted.POBuilder;
-import org.litesoft.persisted.POMetaData;
-import org.litesoft.persisted.Page;
-import org.litesoft.persisted.PersistorConstraintViolationException;
+import org.litesoft.persisted.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class AbstractAdaptorRepository<T extends IPersistedObject, B extends POBuilder<T>, CT extends T> implements IPersistedObjectRepository<T> {
+public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId<ID>, B extends POBuilder<T>, CT extends T>
+        implements IPersistedObjectRepository<ID, T> {
+
   private static final StringCodec NEXT_PAGE_TOKEN_CODEC = HexUTF8v1.CONSISTENT;
 
   private final Class<CT> mClassCT;
@@ -112,7 +108,8 @@ public abstract class AbstractAdaptorRepository<T extends IPersistedObject, B ex
     return (CT)pT;
   }
 
-  protected CT checkCast( T pT ) {
+  @SuppressWarnings("rawtypes")
+  protected CT checkCast(T pT ) {
     if ( pT != null ) {
       Class zClassTI = pT.getClass();
       if ( mClassCT != zClassTI ) {

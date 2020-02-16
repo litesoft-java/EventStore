@@ -1,5 +1,6 @@
 package org.litesoft.persisted;
 
+@SuppressWarnings("rawtypes")
 public interface IPersistedObject {
   Class getDisplayType();
 

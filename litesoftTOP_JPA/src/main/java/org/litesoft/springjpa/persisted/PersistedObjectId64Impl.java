@@ -1,26 +1,26 @@
 package org.litesoft.springjpa.persisted;
 
+import org.litesoft.persisted.AbstractPersistedObjectId64Impl;
+import org.litesoft.persisted.IPersistedObjectId64;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
-import org.litesoft.persisted.AbstractPersistedObjectId32Impl;
-import org.litesoft.persisted.IPersistedObjectId32;
-
 @SuppressWarnings("unused")
 @MappedSuperclass
-public abstract class PersistedObjectId32Impl extends AbstractPersistedObjectId32Impl implements IPersistedObjectId32 {
+public abstract class PersistedObjectId64Impl extends AbstractPersistedObjectId64Impl implements IPersistedObjectId64 {
 
   @Id
   @GeneratedValue
-  private Integer id;
+  private Long id;
 
   @Version
   private Integer version;
 
   @Override
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
 
@@ -30,7 +30,7 @@ public abstract class PersistedObjectId32Impl extends AbstractPersistedObjectId3
   }
 
   @SuppressWarnings("rawtypes")
-  protected void populateAbstract(IPersistedObjectId32.AbstractBuilder them ) {
+  protected void populateAbstract(AbstractBuilder them ) {
     id = them.getId();
     version = them.getVersion();
   }

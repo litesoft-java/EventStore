@@ -3,7 +3,7 @@ package org.litesoft.persisted;
 import java.util.function.Function;
 
 @SuppressWarnings({"unused", "SameParameterValue", "UnusedReturnValue"})
-public class MutationalPersistedObjectId32Updater<PO extends IPersistedObjectId32> extends MutationalPersistedObjectUpdater<PO> {
+public class MutationalPersistedObjectId32Updater<PO extends IPersistedObjectId32> extends MutationalPersistedObjectUpdater<Integer, PO> {
   private final IPersistedObjectRepositoryId32<PO> mRepository;
 
   public MutationalPersistedObjectId32Updater( IPersistedObjectRepositoryId32<PO> pRepository ) {

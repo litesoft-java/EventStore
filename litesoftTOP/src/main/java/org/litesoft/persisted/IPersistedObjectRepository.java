@@ -1,9 +1,16 @@
 package org.litesoft.persisted;
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
-public interface IPersistedObjectRepository<T extends IPersistedObject> {
+public interface IPersistedObjectRepository<ID, T extends IPersistedObjectId<ID>> {
 
   Class<T> getPoType();
+
+  /**
+   * @param pId Nullable - note: null will be returned a null if passed in
+   *
+   * @return Nullable (null means not found)
+   */
+  T findById( ID pId );
 
   /**
    * @param pPO !null
@@ -30,7 +37,9 @@ public interface IPersistedObjectRepository<T extends IPersistedObject> {
    *
    * @return Nullable (null means not found: null ID or instance has been deleted)
    */
-  T refresh( T pPO );
+  default T refresh( T pPO ) {
+    return (pPO == null) ? null : findById( pPO.getId() );
+  }
 
   /**
    * Load the First Page with a maximum if <code>pLimit</code> results.

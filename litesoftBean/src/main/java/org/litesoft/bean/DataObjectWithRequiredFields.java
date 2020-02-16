@@ -1,5 +1,12 @@
 package org.litesoft.bean;
 
+import java.time.Instant;
+import java.util.function.Supplier;
+
+import org.litesoft.alleviative.validation.Email;
+import org.litesoft.alleviative.validation.ISO8601;
+import org.litesoft.alleviative.validation.ValidationResult;
+
 @SuppressWarnings({"SameParameterValue", "unused"})
 public class DataObjectWithRequiredFields {
   protected String significantOr( String pValue, String pDefault ) {
@@ -35,7 +42,7 @@ public class DataObjectWithRequiredFields {
         return pValue;
       }
     }
-    throw requiredIllegalStateException( pWhat, "string with no significance" );
+    throw requiredStringIllegalStateException( pWhat );
   }
 
   protected String requiredSignificant( String pWhat, String pValue ) {
@@ -45,7 +52,43 @@ public class DataObjectWithRequiredFields {
         return pValue;
       }
     }
-    throw requiredIllegalStateException( pWhat, "string with no significance" );
+    throw requiredStringIllegalStateException( pWhat );
+  }
+
+  protected String requiredEmail( String pWhat, String pValue ) {
+    ValidationResult<String> zResult = Email.validateRequired( pValue );
+    if ( !zResult.hasError() ) {
+      return zResult.getValue();
+    }
+    throw requiredIllegalStateException( pWhat, zResult.getError() );
+  }
+
+  protected String requiredISO8601Min( String pWhat, String pValue, Supplier<Instant> pDefaultSupplier ) {
+    if ( pValue != null ) {
+      pValue = pValue.trim();
+      if ( pValue.isEmpty() ) {
+        pValue = null;
+      }
+    }
+    if ( pValue == null ) {
+      Instant zInstant = null;
+      if ( pDefaultSupplier != null ) {
+        zInstant = pDefaultSupplier.get();
+      }
+      if ( zInstant == null ) {
+        throw requiredStringIllegalStateException( pWhat );
+      }
+      pValue = zInstant.toString();
+    }
+    ValidationResult<String> zResult = ISO8601.validateRequired( pValue ).toMin();
+    if ( !zResult.hasError() ) {
+      return zResult.getValue();
+    }
+    throw requiredIllegalStateException( pWhat, zResult.getError() );
+  }
+
+  private IllegalStateException requiredStringIllegalStateException( String pWhat ) {
+    return requiredIllegalStateException( pWhat, "string with no significance" );
   }
 
   private IllegalStateException requiredIllegalStateException( String pWhat, String pWhy ) {

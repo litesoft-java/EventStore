@@ -4,10 +4,10 @@ import java.util.Objects;
 import java.util.function.Function;
 
 @SuppressWarnings({"unused", "WeakerAccess", "SameParameterValue", "UnusedReturnValue"})
-public class MutationalPersistedObjectUpdater<PO extends IPersistedObject> {
-  private final IPersistedObjectRepository<PO> mRepository;
+public class MutationalPersistedObjectUpdater<ID, PO extends IPersistedObjectId<ID>> {
+  private final IPersistedObjectRepository<ID, PO> mRepository;
 
-  protected MutationalPersistedObjectUpdater( IPersistedObjectRepository<PO> pRepository ) {
+  protected MutationalPersistedObjectUpdater( IPersistedObjectRepository<ID, PO> pRepository ) {
     mRepository = pRepository;
   }
 
