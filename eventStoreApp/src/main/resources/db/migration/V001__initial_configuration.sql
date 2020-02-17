@@ -6,7 +6,7 @@ CREATE TABLE event_log (
   unique_obf       varchar(271)  NOT NULL, /* Unique OrderBy Field (OBF) (16+1+254): ts_when - user_email */
   user_email       varchar(254)  NOT NULL,
   what             varchar(64)   NOT NULL,
-  ts_when          varchar(16)   NOT NULL, /* ISO8601 DateTime to the Minute */
+  ts_when          varchar(17)   NOT NULL, /* ISO8601 DateTime to the Minute */
   lcl_time_offset  varchar(8)    DEFAULT NULL,
   lcl_tz_name      varchar(8)    DEFAULT NULL,
   lcl_where        varchar(32)   DEFAULT NULL,
