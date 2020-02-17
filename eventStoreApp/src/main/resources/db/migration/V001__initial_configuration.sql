@@ -7,12 +7,12 @@ CREATE TABLE event_log (
   user_email       varchar(254)  NOT NULL,
   what             varchar(64)   NOT NULL,
   ts_when          varchar(17)   NOT NULL, /* ISO8601 DateTime to the Minute */
-  lcl_time_offset  varchar(8)    DEFAULT NULL,
+  lcl_time_offset  varchar(8)    DEFAULT NULL, /* All of these 'Nullable' fields need to be NULL by default to tell the APi Versions apart on Updates! */
   lcl_tz_name      varchar(8)    DEFAULT NULL,
   lcl_where        varchar(32)   DEFAULT NULL,
-  billable         BOOLEAN       DEFAULT FALSE,
+  billable         BOOLEAN       DEFAULT NULL,
   client           varchar(64)   DEFAULT NULL,
-  done             BOOLEAN       DEFAULT FALSE,
+  done             BOOLEAN       DEFAULT NULL,
   PRIMARY KEY (id)
 );
 

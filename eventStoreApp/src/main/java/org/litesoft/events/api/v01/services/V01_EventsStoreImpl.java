@@ -1,12 +1,15 @@
 package org.litesoft.events.api.v01.services;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.litesoft.alleviative.validation.NotNull;
 import org.litesoft.alleviative.validation.Significant;
 import org.litesoft.events.api.v01.model.CreateEvent;
 import org.litesoft.events.api.v01.model.ReturnedEvent;
 import org.litesoft.events.api.v01.model.UpdateEvent;
+import org.litesoft.events.services.AbstractEventStore;
 import org.litesoft.events.services.persistence.persisted.EventLogPO;
 import org.litesoft.events.services.persistence.repos.EventLogRepository;
 import org.litesoft.persisted.Page;
@@ -15,45 +18,96 @@ import org.litesoft.restish.support.auth.AuthorizePair;
 import org.springframework.stereotype.Service;
 
 @Service
-public class V01_EventsStoreImpl implements V01_EventsStore {
+public class V01_EventsStoreImpl extends AbstractEventStore implements V01_EventsStore {
+  private static final String[] PO_SUPPORTED_FIELDS = {
+          "User",
+          "What",
+          "When",
+          "Where",
+          };
+  private static final String[] API_UNSUPPORTED_FIELDS = {
+          "LocalTimeOffset",
+          "LocalTzName",
+          "Billable",
+          "Client",
+          "Done",
+          };
 
-    private final EventLogRepository mRepository;
+  public V01_EventsStoreImpl( EventLogRepository pRepository ) {
+    super( "v01", pRepository, EventLogPO.META_DATA, PO_SUPPORTED_FIELDS, API_UNSUPPORTED_FIELDS );
+  }
 
-    public V01_EventsStoreImpl( EventLogRepository pRepository ) {
-        mRepository = pRepository;
+  @Override
+  public PageData<ReturnedEvent> latestEvents( AuthorizePair pAuthorizePair, String pUser, int pLimit ) {
+    System.out.println( "V01_EventsStoreImpl.latestEvents: " + pAuthorizePair );
+
+    Page<EventLogPO> zEventsPage = firstPage( pAuthorizePair, pUser, pLimit );
+
+    List<EventLogPO> zPOs = NotNull.or( zEventsPage.getPOs(), Collections.emptyList() );
+    List<ReturnedEvent> zData = zPOs.stream().map( this::mapPO2RE ).collect( Collectors.toList() );
+
+    return new PageData<>( zData );
+  }
+
+  @Override
+  public ReturnedEvent createEvent( AuthorizePair pAuthorizePair, CreateEvent pEvent ) {
+    if ( pEvent == null ) {
+      return null;
     }
 
-    @Override
-    public PageData<ReturnedEvent> latestEvents(AuthorizePair pAuthorizePair, String pUser, int pLimit) {
-        System.out.println("V01_EventsStoreImpl.latestEvents: " + pAuthorizePair);
-        pUser = Significant.orNull( pUser );
+    EventLogPO zPO = EventLogPO.builder()
+            .withUser( pEvent.getUser() )
+            .withWhat( pEvent.getWhat() )
+            .withWhen( pEvent.getWhen() )
+            .withWhere( pEvent.getWhere() )
+            .build();
 
-        Page<EventLogPO> zEventsPage = (pUser == null) ?
-                                           mRepository.firstPageAllUsers( pLimit ) :
-                                           mRepository.firstPageByUser( pUser, pLimit );
-        List<EventLogPO> zPOs = zEventsPage.getPOs();
-        List<ReturnedEvent> zData = new ArrayList<>( zPOs.size() );
+    EventLogPO zInsertedPO = mRepository.insert( zPO );
 
-        return new PageData<>(zData);
+    return mapPO2RE( zInsertedPO );
+  }
+
+  @Override
+  public ReturnedEvent deleteEvent( AuthorizePair pAuthorizePair, String pID ) {
+    EventLogPO zPO = mRepository.findById( Significant.orNull( pID ) );
+    if ( zPO != null ) {
+      mRepository.delete( zPO );
     }
+    return mapPO2RE( zPO );
+  }
 
-    @Override
-    public ReturnedEvent createEvent(AuthorizePair pAuthorizePair, CreateEvent pEvent) {
-        return null;
-    }
+  @Override
+  public ReturnedEvent readEvent( AuthorizePair pAuthorizePair, String pID ) {
+    return mapPO2RE( mRepository.findById( Significant.orNull( pID ) ) );
+  }
 
-    @Override
-    public ReturnedEvent deleteEvent(AuthorizePair pAuthorizePair, String pID) {
-        return null;
+  @Override
+  public ReturnedEvent updateEvent( AuthorizePair pAuthorizePair, UpdateEvent pEvent ) {
+    if ( pEvent == null ) {
+      return null;
     }
+    String zUser = requiredSignificantField( "User", pEvent.getUser() );
+    String zWhat = requiredSignificantField( "What", pEvent.getWhat() );
+    String zWhen = requiredSignificantField( "When", pEvent.getWhen() );
+    String zWhere = Significant.orNull( pEvent.getWhere() );
 
-    @Override
-    public ReturnedEvent readEvent(AuthorizePair pAuthorizePair, String pID) {
-        return null;
-    }
+    EventLogPO.Builder zBuilder = checkUpdateApiBasedChanges( pEvent.getId(),
+                                                              "User", zUser,
+                                                              "What", zWhat,
+                                                              "When", zWhen,
+                                                              "Where", zWhere );
+    EventLogPO zUpdated = update( zBuilder );
+    return mapPO2RE( zUpdated );
+  }
 
-    @Override
-    public ReturnedEvent updateEvent(AuthorizePair pAuthorizePair, UpdateEvent pEvent) {
-        return null;
-    }
+  private ReturnedEvent mapPO2RE( EventLogPO pPO ) {
+    return (pPO == null) ? null :
+           new ReturnedEvent()
+                   .id( pPO.getId() )
+                   .user( pPO.getUser() )
+                   .what( pPO.getWhat() )
+                   .when( pPO.getWhen() )
+                   .where( pPO.getWhere() )
+            ;
+  }
 }

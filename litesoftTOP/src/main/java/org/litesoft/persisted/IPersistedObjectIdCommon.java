@@ -10,30 +10,6 @@ import java.util.Map;
 
 public interface IPersistedObjectIdCommon<ID> extends IPersistedObjectId<ID>, VersionAccessor {
 
-  @Override
-  default void assertCanInsert() {
-    if ( getId() != null ) {
-      throw new IllegalArgumentException( "Can NOT 'insert' a '" + getDisplayType().getSimpleName() +
-                                          "' with an Id: " + this );
-    }
-    if ( getVersion() != null ) {
-      throw new IllegalArgumentException( "Can NOT 'insert' a '" + getDisplayType().getSimpleName() +
-                                          "' with a Version: " + this );
-    }
-  }
-
-  @Override
-  default void assertCanUpdate() {
-    if ( getId() == null ) {
-      throw new IllegalArgumentException( "Can NOT 'update' a '" + getDisplayType().getSimpleName() +
-                                          "' without an Id: " + this );
-    }
-    if ( getVersion() == null ) {
-      throw new IllegalArgumentException( "Can NOT 'update' a '" + getDisplayType().getSimpleName() +
-                                          "' without a Version: " + this );
-    }
-  }
-
   abstract class AbstractIdAndVersionBuilder<ID, T extends IPersistedObjectIdCommon<ID>, B extends POBuilder<T>>
           extends DataObjectWithRequiredFields implements POBuilder<T>,
                                                           IdAccessor<ID>, VersionAccessor {

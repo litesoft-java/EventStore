@@ -7,8 +7,11 @@ import java.util.Optional;
 public interface SpringRepositoryId64<T> extends SpringRepository<T>,
                                                  CrudRepository<T, Long> {
   @Override
-  <S extends T> S save(S var1);
+  <S extends T> S save( S entity );
 
   @Override
-  Optional<T> findById(Long pId);
+  void delete( T entity );
+
+  @Override
+  Optional<T> findById( Long pId );
 }

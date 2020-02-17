@@ -20,11 +20,6 @@ public abstract class AbstractAdaptorRepositoryId32<T extends IPersistedObjectId
 
   @Override
   public T findById( Integer pId ) {
-    return pId == null ? null : disconnect( mRepository.findById( pId ) );
-  }
-
-  @Override
-  protected T save( CT pEntity ) {
-    return disconnect( mRepository.save( pEntity ) );
+    return (pId == null) ? null : disconnect( mRepository.findById( pId ) );
   }
 }

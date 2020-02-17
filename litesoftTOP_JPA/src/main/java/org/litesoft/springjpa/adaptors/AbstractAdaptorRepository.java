@@ -69,6 +69,19 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
     }
   }
 
+  public void delete( T pPO ) {
+    deleteProxy( checkDeleteAndCopy( pPO ), this::createUpdateConstraintViolationMessage );
+  }
+
+  private void deleteProxy( CT pPO, Function<CT, String> pConstraintViolationMessageBuilder ) {
+    try {
+      mTransactionalProxy.execute( () -> mRepository.delete( pPO ) );
+    }
+    catch ( ConstraintViolationException | DataIntegrityViolationException e ) {
+      throw new PersistorConstraintViolationException( pConstraintViolationMessageBuilder.apply( pPO ) );
+    }
+  }
+
   protected String createUpdateConstraintViolationMessage( T pPO ) {
     return "!Unique on Update" + getPoType().getSimpleName();
   }
@@ -102,7 +115,9 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
     return PageRequest.of( 0, pLimit + 1 );
   }
 
-  abstract protected T save( CT pEntity );
+  protected T save( CT pEntity ) {
+    return disconnect( mRepository.save( pEntity ) );
+  }
 
   abstract protected String extractPagedOrderByAttribute( CT pEntityNonNull );
 
@@ -140,6 +155,12 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
   protected CT checkUpdateAndCopy( T pEntity ) {
     checkActionOnNull( "Update", pEntity );
     pEntity.assertCanUpdate();
+    return cast( mMetaData.copyAll( pEntity ) );
+  }
+
+  protected CT checkDeleteAndCopy( T pEntity ) {
+    checkActionOnNull( "Delete", pEntity );
+    pEntity.assertCanDelete();
     return cast( mMetaData.copyAll( pEntity ) );
   }
 

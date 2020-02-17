@@ -7,4 +7,6 @@ public interface IPersistedObject {
   void assertCanInsert();
 
   void assertCanUpdate();
+
+  void assertCanDelete();
 }

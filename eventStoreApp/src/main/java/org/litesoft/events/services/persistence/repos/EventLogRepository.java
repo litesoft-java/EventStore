@@ -15,6 +15,13 @@ public interface EventLogRepository extends EventLogCodeLocator,
   }
 
   /**
+   * Delete the PO where the ID & Version match.
+   *
+   * @param pPO !null
+   */
+  void delete( EventLogPO pPO );
+
+  /**
    * Load the First Page of Events (for All Users) with a maximum of <code>pLimit</code> results.
    *
    * @param pLimit if <code>pLimit</code> is not between (inclusive) 1 and 10000, it is treated as 1.

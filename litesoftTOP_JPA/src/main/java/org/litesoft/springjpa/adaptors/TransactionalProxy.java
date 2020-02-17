@@ -8,4 +8,9 @@ public class TransactionalProxy {
   public <R> R execute( Supplier<R> pSupplier ) {
     return pSupplier.get();
   }
+
+  @Transactional
+  public void execute( Runnable pRunnable ) {
+    pRunnable.run();
+  }
 }
