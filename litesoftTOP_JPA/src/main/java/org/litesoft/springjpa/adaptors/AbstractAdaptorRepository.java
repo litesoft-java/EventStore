@@ -9,7 +9,15 @@ import java.util.function.Function;
 import org.hibernate.exception.ConstraintViolationException;
 import org.litesoft.codecs.text.HexUTF8v1;
 import org.litesoft.codecs.text.StringCodec;
-import org.litesoft.persisted.*;
+import org.litesoft.persisted.BackdoorIdGenerationAccessor;
+import org.litesoft.persisted.IPersistedObject;
+import org.litesoft.persisted.IPersistedObjectId;
+import org.litesoft.persisted.IPersistedObjectRepository;
+import org.litesoft.persisted.NextPageToken;
+import org.litesoft.persisted.POBuilder;
+import org.litesoft.persisted.POMetaData;
+import org.litesoft.persisted.Page;
+import org.litesoft.persisted.PersistorConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -109,7 +117,7 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
   }
 
   @SuppressWarnings("rawtypes")
-  protected CT checkCast(T pT ) {
+  protected CT checkCast( T pT ) {
     if ( pT != null ) {
       Class zClassTI = pT.getClass();
       if ( mClassCT != zClassTI ) {
@@ -126,7 +134,7 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
   protected CT checkInsertAndCopy( T pEntity ) {
     checkActionOnNull( "Insert", pEntity );
     pEntity.assertCanInsert();
-    return cast( mMetaData.copyAll( pEntity ) );
+    return BackdoorIdGenerationAccessor.generateIdForInsert( cast( mMetaData.copyAll( pEntity ) ) );
   }
 
   protected CT checkUpdateAndCopy( T pEntity ) {

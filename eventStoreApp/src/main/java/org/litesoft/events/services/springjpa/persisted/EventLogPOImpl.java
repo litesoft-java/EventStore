@@ -10,7 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-@SuppressWarnings({"unused", "WeakerAccess", "rawtypes"})
+@SuppressWarnings({"unused", "WeakerAccess", "rawtypes", "JpaDataSourceORMInspection"})
 @Entity
 @Table(name = "event_log")
 public class EventLogPOImpl extends PersistedObjectIdUuidImpl implements EventLogCodeLocator,
