@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  jackson:
+    date-format: org.litesoft.swagger.RFC3339DateFormat
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driverClassName: org.h2.Driver
+    maxActive: 4
+    allowMultiQueries: true
+    username: root
+    password:

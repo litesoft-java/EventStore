@@ -17,7 +17,7 @@ public interface SpringEventLogRepository extends EventLogCodeLocator,
   List<EventLogPOImpl> firstPageByUser( Pageable limit, @Param("user") String user );
 
   @Query("FROM EventLogPOImpl t WHERE t.user = :user AND t.when < :before  ORDER BY t.when DESC")
-  List<EventLogPOImpl> nextPageByUser( Pageable limit, @Param("user") String user, @Param("after") String before );
+  List<EventLogPOImpl> nextPageByUser( Pageable limit, @Param("user") String user, @Param("before") String before );
 
   @Override
   @Query("FROM EventLogPOImpl t ORDER BY t.unique_obf DESC")
@@ -25,5 +25,5 @@ public interface SpringEventLogRepository extends EventLogCodeLocator,
 
   @Override
   @Query("FROM EventLogPOImpl t WHERE t.unique_obf < :before ORDER BY t.unique_obf DESC")
-  List<EventLogPOImpl> findNext( Pageable limit, @Param("after") String before );
+  List<EventLogPOImpl> findNext( Pageable limit, @Param("before") String before );
 }

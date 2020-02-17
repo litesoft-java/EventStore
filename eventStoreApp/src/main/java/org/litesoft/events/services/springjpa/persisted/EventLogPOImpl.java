@@ -19,14 +19,17 @@ public class EventLogPOImpl extends PersistedObjectIdUuidImpl implements EventLo
     META_DATA.builderFactory( BuilderImpl::new );
   }
 
-  private String unique_obf; // OrderBy Field (OBF) Unique: state - date - course - location - encodedPassword
+  private String unique_obf; // OrderBy Field (OBF) Unique: when - user
+  @Column(name = "user_email")
   private String user;
   private String what;
+  @Column(name = "ts_when")
   private String when; // ISO8601 DateTime to the Minute
   @Column(name = "lcl_time_offset")
   private String localTimeOffset;
   @Column(name = "lcl_tz_name")
   private String localTzName;
+  @Column(name = "lcl_where")
   private String where;
   private Boolean billable;
   private String client;
