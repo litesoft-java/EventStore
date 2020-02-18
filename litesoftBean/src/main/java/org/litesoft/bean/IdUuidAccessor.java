@@ -2,7 +2,7 @@ package org.litesoft.bean;
 
 @SuppressWarnings("unused")
 public interface IdUuidAccessor extends IdAccessor<String> {
-    IdUuidAccessor NOOP = deNull(null);
+    IdUuidAccessor NOOP = deNull( null );
 
     /**
      * get ID (UUID)
@@ -12,7 +12,7 @@ public interface IdUuidAccessor extends IdAccessor<String> {
     @Override
     String getId();
 
-    static IdUuidAccessor deNull(IdUuidAccessor it) {
+    static IdUuidAccessor deNull( IdUuidAccessor it ) {
         return (it != null) ? it : () -> null;
     }
 }

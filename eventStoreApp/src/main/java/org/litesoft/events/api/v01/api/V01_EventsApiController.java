@@ -22,23 +22,23 @@ import javax.validation.constraints.Min;
 @SuppressWarnings({"unused", "DefaultAnnotationParam"})
 public class V01_EventsApiController extends AbstractRestishController<EventsArray> implements EventsApi {
 
-    private static final Logger log = LoggerFactory.getLogger(V01_EventsApiController.class);
+    private static final Logger log = LoggerFactory.getLogger( V01_EventsApiController.class );
 
-    private static final PageLimiter LIMITER = PageLimiter.withMin(0).withDefault(100).withMax(1000).build();
+    private static final PageLimiter LIMITER = PageLimiter.withMin( 0 ).withDefault( 100 ).withMax( 1000 ).build();
 
     private final V01_EventsStore mStore;
 
-    public V01_EventsApiController(Authorization pAuthorization, V01_EventsStore pStore) {
-        super(pAuthorization);
+    public V01_EventsApiController( Authorization pAuthorization, V01_EventsStore pStore ) {
+        super( pAuthorization );
         mStore = pStore;
     }
 
-    public ResponseEntity<EventsArray> latestEvents(@ApiParam(value = "email address of the user you want to see Events for.  If not provided, then Events for all 'user's are returned.")
-                                                    @Valid @RequestParam(value = "user", required = false)
-                                                            String user,
-                                                    @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
-                                                    @Valid @RequestParam(value = "limit", required = false)
-                                                            Integer limit) {
-        return process(() -> EventsArray.from(mStore.latestEvents(authorizePair(), user, LIMITER.normalize(limit))));
+    public ResponseEntity<EventsArray> latestEvents( @ApiParam(value = "email address of the user you want to see Events for.  If not provided, then Events for all 'user's are returned.")
+                                                     @Valid @RequestParam(value = "user", required = false)
+                                                             String user,
+                                                     @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
+                                                     @Valid @RequestParam(value = "limit", required = false)
+                                                             Integer limit ) {
+        return process( () -> EventsArray.from( mStore.latestEvents( authorizePair(), user, LIMITER.normalize( limit ) ) ) );
     }
 }

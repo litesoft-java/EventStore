@@ -12,26 +12,26 @@ import org.litesoft.persisted.IPersistedObjectId32;
 @MappedSuperclass
 public abstract class PersistedObjectId32Impl extends AbstractPersistedObjectId32Impl implements IPersistedObjectId32 {
 
-  @Id
-  @GeneratedValue
-  private Integer id;
+    @Id
+    @GeneratedValue
+    private Integer id;
 
-  @Version
-  private Integer version;
+    @Version
+    private Integer version;
 
-  @Override
-  public Integer getId() {
-    return id;
-  }
+    @Override
+    public Integer getId() {
+        return id;
+    }
 
-  @Override
-  public Integer getVersion() {
-    return version;
-  }
+    @Override
+    public Integer getVersion() {
+        return version;
+    }
 
-  @SuppressWarnings("rawtypes")
-  protected void populateAbstract(IPersistedObjectId32.AbstractBuilder them ) {
-    id = them.getId();
-    version = them.getVersion();
-  }
+    @SuppressWarnings("rawtypes")
+    protected void populateAbstract( IPersistedObjectId32.AbstractBuilder them ) {
+        id = them.getId();
+        version = them.getVersion();
+    }
 }

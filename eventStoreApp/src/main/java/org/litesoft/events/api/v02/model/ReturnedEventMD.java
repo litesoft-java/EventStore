@@ -13,14 +13,14 @@ public class ReturnedEventMD extends AbstractAllEventPropertiesMD<ReturnedEvent>
     }
 
     @Override
-    protected void collectRequiredSuppliers(List<NamedFunction<ReturnedEvent>> pCollector) {
-        Collections.addAll(pCollector
+    protected void collectRequiredSuppliers( List<NamedFunction<ReturnedEvent>> pCollector ) {
+        Collections.addAll( pCollector
                 , getId()
                 , getUser()
                 , getWhat()
                 , getWhen()
         );
 
-        super.collectRequiredSuppliers(pCollector);
+        super.collectRequiredSuppliers( pCollector );
     }
 }

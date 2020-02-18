@@ -26,10 +26,9 @@ public interface EventApi {
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    ResponseEntity<ReturnedEvent> createEvent(@ApiParam(value = "Event to create", required = true)
-                                              @Valid @RequestBody
-                                                      CreateEvent body);
-
+    ResponseEntity<ReturnedEvent> createEvent( @ApiParam(value = "Event to create", required = true)
+                                               @Valid @RequestBody
+                                                       CreateEvent body );
 
     @ApiOperation(value = "delete an Event", nickname = "deleteEvent", notes = "Delete an Event by 'updateToken'", response = ReturnedEvent.class, tags = {"developers",})
     @ApiResponses(value = {
@@ -40,10 +39,9 @@ public interface EventApi {
     @RequestMapping(value = "/event/{updateToken}",
             produces = {"application/json"},
             method = RequestMethod.DELETE)
-    ResponseEntity<ReturnedEvent> deleteEvent(@ApiParam(value = "", required = true)
-                                              @PathVariable("updateToken")
-                                                      String updateToken);
-
+    ResponseEntity<ReturnedEvent> deleteEvent( @ApiParam(value = "", required = true)
+                                               @PathVariable("updateToken")
+                                                       String updateToken );
 
     @ApiOperation(value = "read an Event", nickname = "readEvent", notes = "Reads an Event by 'id'", response = ReturnedEvent.class, tags = {"developers",})
     @ApiResponses(value = {
@@ -52,10 +50,9 @@ public interface EventApi {
     @RequestMapping(value = "/event/{id}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<ReturnedEvent> readEvent(@ApiParam(value = "", required = true)
-                                            @PathVariable("id")
-                                                    String id);
-
+    ResponseEntity<ReturnedEvent> readEvent( @ApiParam(value = "", required = true)
+                                             @PathVariable("id")
+                                                     String id );
 
     @ApiOperation(value = "update an Event", nickname = "updateEvent", notes = "Update an Event (patches)", response = ReturnedEvent.class, tags = {"developers",})
     @ApiResponses(value = {
@@ -70,11 +67,10 @@ public interface EventApi {
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.PATCH)
-    ResponseEntity<ReturnedEvent> updateEvent(@ApiParam(value = "Event changes to patch", required = true)
-                                              @Valid @RequestBody
-                                                      PatchEvent body,
-                                              @ApiParam(value = "", required = true)
-                                              @PathVariable("updateToken")
-                                                      String updateToken);
-
+    ResponseEntity<ReturnedEvent> updateEvent( @ApiParam(value = "Event changes to patch", required = true)
+                                               @Valid @RequestBody
+                                                       PatchEvent body,
+                                               @ApiParam(value = "", required = true)
+                                               @PathVariable("updateToken")
+                                                       String updateToken );
 }

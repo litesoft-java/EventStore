@@ -12,26 +12,26 @@ import javax.persistence.Version;
 @MappedSuperclass
 public abstract class PersistedObjectId64Impl extends AbstractPersistedObjectId64Impl implements IPersistedObjectId64 {
 
-  @Id
-  @GeneratedValue
-  private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-  @Version
-  private Integer version;
+    @Version
+    private Integer version;
 
-  @Override
-  public Long getId() {
-    return id;
-  }
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-  @Override
-  public Integer getVersion() {
-    return version;
-  }
+    @Override
+    public Integer getVersion() {
+        return version;
+    }
 
-  @SuppressWarnings("rawtypes")
-  protected void populateAbstract(AbstractBuilder them ) {
-    id = them.getId();
-    version = them.getVersion();
-  }
+    @SuppressWarnings("rawtypes")
+    protected void populateAbstract( AbstractBuilder them ) {
+        id = them.getId();
+        version = them.getVersion();
+    }
 }

@@ -1,6 +1,6 @@
 package org.litesoft.content;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "rawtypes"})
 public interface ContentStateFetcher<Key> {
-  ContentState fetchState( Key pKey );
+    ContentState fetchState( Key pKey );
 }

@@ -13,29 +13,30 @@ public class ApiAuthFilter extends AbstractApiAuthFilter {
 
     private final Authorization mAuthorization;
 
-    public ApiAuthFilter(Authorization pAuthorization) {
+    public ApiAuthFilter( Authorization pAuthorization ) {
         mAuthorization = pAuthorization;
     }
 
     @Override
-    protected void grabAuth(String auth) throws BadAuthorizationFormException {
-        if (auth == null) {
-            mAuthorization.set(AuthorizePair.LOCALHOST);
+    protected void grabAuth( String auth )
+            throws BadAuthorizationFormException {
+        if ( auth == null ) {
+            mAuthorization.set( AuthorizePair.LOCALHOST );
             return;
         }
-        if (auth.startsWith(BEARER_PREFIX)) {
-            String fields = auth.substring(BEARER_PREFIX.length()).trim();
-            int slashAt = fields.indexOf('/');
-            if (slashAt != -1) {
-                String secretToken = fields.substring(0, slashAt).trim();
-                String userEmail = fields.substring(slashAt + 1).trim().toLowerCase();
-                if (!secretToken.isEmpty() && !userEmail.isEmpty()) {
-                    mAuthorization.set(AuthorizePair.withSecretToken(secretToken).withUserEmail(userEmail).build());
+        if ( auth.startsWith( BEARER_PREFIX ) ) {
+            String fields = auth.substring( BEARER_PREFIX.length() ).trim();
+            int slashAt = fields.indexOf( '/' );
+            if ( slashAt != -1 ) {
+                String secretToken = fields.substring( 0, slashAt ).trim();
+                String userEmail = fields.substring( slashAt + 1 ).trim().toLowerCase();
+                if ( !secretToken.isEmpty() && !userEmail.isEmpty() ) {
+                    mAuthorization.set( AuthorizePair.withSecretToken( secretToken ).withUserEmail( userEmail ).build() );
                     return;
                 }
             }
         }
-        throw new BadAuthorizationFormException(auth);
+        throw new BadAuthorizationFormException( auth );
     }
 
     @Override

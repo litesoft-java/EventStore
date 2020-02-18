@@ -23,23 +23,23 @@ import javax.validation.constraints.Min;
 @SuppressWarnings({"unused", "DefaultAnnotationParam", "MVCPathVariableInspection"})
 public class V02_EventsNextPageApiController extends AbstractRestishController<PageEvents> implements EventsNextPageApi {
 
-    private static final Logger log = LoggerFactory.getLogger(V02_EventsNextPageApiController.class);
+    private static final Logger log = LoggerFactory.getLogger( V02_EventsNextPageApiController.class );
 
-    private static final PageLimiter LIMITER = PageLimiter.withMin(0).withDefault(100).withMax(1000).build();
+    private static final PageLimiter LIMITER = PageLimiter.withMin( 0 ).withDefault( 100 ).withMax( 1000 ).build();
 
     private final V02_EventsStore mStore;
 
-    public V02_EventsNextPageApiController(Authorization pAuthorization, V02_EventsStore pStore) {
-        super(pAuthorization);
+    public V02_EventsNextPageApiController( Authorization pAuthorization, V02_EventsStore pStore ) {
+        super( pAuthorization );
         mStore = pStore;
     }
 
-    public ResponseEntity<PageEvents> nextEvents(@ApiParam(value = "a 'cursor' for retreiving the next page of Events.", required = true)
-                                                 @PathVariable("nextToken")
-                                                         String nextToken,
-                                                 @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
-                                                 @Valid @RequestParam(value = "limit", required = false)
-                                                         Integer limit) {
-        return process(() -> PageEvents.from(mStore.nextEvents(authorizePair(), nextToken, LIMITER.optionallyNormalize(limit))));
+    public ResponseEntity<PageEvents> nextEvents( @ApiParam(value = "a 'cursor' for retreiving the next page of Events.", required = true)
+                                                  @PathVariable("nextToken")
+                                                          String nextToken,
+                                                  @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
+                                                  @Valid @RequestParam(value = "limit", required = false)
+                                                          Integer limit ) {
+        return process( () -> PageEvents.from( mStore.nextEvents( authorizePair(), nextToken, LIMITER.optionallyNormalize( limit ) ) ) );
     }
 }

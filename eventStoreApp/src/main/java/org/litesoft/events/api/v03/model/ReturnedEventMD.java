@@ -7,21 +7,21 @@ import java.util.Collections;
 import java.util.List;
 
 public class ReturnedEventMD extends AbstractAllEventPropertiesMD<ReturnedEvent> {
-    public static final SchemaMD<ReturnedEvent> INSTANCE = new ReturnedEventMD();
+    public static final ReturnedEventMD INSTANCE = new ReturnedEventMD();
 
     private ReturnedEventMD() {
     }
 
     @Override
-    protected void collectRequiredSuppliers(List<NamedFunction<ReturnedEvent>> pCollector) {
-        Collections.addAll(pCollector
-                , getId()
-                , getUpdateToken()
-                , getUser()
-                , getWhat()
-                , getWhen()
+    protected void collectRequiredSuppliers( List<NamedFunction<ReturnedEvent>> pCollector ) {
+        Collections.addAll( pCollector
+                , nfId()
+                , nfUpdateToken()
+                , nfUser()
+                , nfWhat()
+                , nfWhen()
         );
 
-        super.collectRequiredSuppliers(pCollector);
+        super.collectRequiredSuppliers( pCollector );
     }
 }

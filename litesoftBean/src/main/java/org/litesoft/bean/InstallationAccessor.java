@@ -2,9 +2,9 @@ package org.litesoft.bean;
 
 @SuppressWarnings("unused")
 public interface InstallationAccessor extends Accessor {
-  String getInstallation();
+    String getInstallation();
 
-  static InstallationAccessor deNull( InstallationAccessor it ) {
-    return (it != null) ? it : () -> null;
-  }
+    static InstallationAccessor deNull( InstallationAccessor it ) {
+        return (it != null) ? it : () -> null;
+    }
 }

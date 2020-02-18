@@ -5,8 +5,8 @@ import org.litesoft.HttpStatusAccessor;
 public class RestishException extends RuntimeException implements HttpStatusAccessor {
     private final int mStatusCode;
 
-    public RestishException(int pStatusCode, String message) {
-        super(message);
+    public RestishException( int pStatusCode, String message ) {
+        super( message );
         mStatusCode = pStatusCode;
     }
 

@@ -10,7 +10,7 @@ public class Validation {
         return false;
     }
 
-    public boolean hasErrorForAttribute(String pAttributeName) {
+    public boolean hasErrorForAttribute( String pAttributeName ) {
         return false;
     }
 
@@ -19,42 +19,42 @@ public class Validation {
         return NO_VALIDATION_ERRORS;
     }
 
-    public Validation addError(String pAttributeName, String pError) {
-        pAttributeName = assertAttributeNameSignificant(pAttributeName);
-        pError = significantOrNull(pError);
+    public Validation addError( String pAttributeName, String pError ) {
+        pAttributeName = assertAttributeNameSignificant( pAttributeName );
+        pError = significantOrNull( pError );
         return (pError != null) ?
-                new WithTextErrors(this, pAttributeName, pError) :
-                this;
+               new WithTextErrors( this, pAttributeName, pError ) :
+               this;
     }
 
-    public Validation addError(String pAttributeName, Validation pError) {
-        pAttributeName = assertAttributeNameSignificant(pAttributeName);
+    public Validation addError( String pAttributeName, Validation pError ) {
+        pAttributeName = assertAttributeNameSignificant( pAttributeName );
         return ((pError != null) && pError.hasErrors()) ?
-                new WithValidationErrors(this, pAttributeName, pError) :
-                this;
+               new WithValidationErrors( this, pAttributeName, pError ) :
+               this;
     }
 
-    public Validation addErrorsOnClass(Object pAttributeOwner) {
+    public Validation addErrorsOnClass( Object pAttributeOwner ) {
         return (hasErrors() && (pAttributeOwner != null)) ?
-                new ErroredClass(this, pAttributeOwner.getClass().getSimpleName()) :
-                this;
+               new ErroredClass( this, pAttributeOwner.getClass().getSimpleName() ) :
+               this;
     }
 
-    protected void appendError(StringBuilder sb, int pIndent) {
+    protected void appendError( StringBuilder sb, int pIndent ) {
     }
 
-    protected String assertAttributeNameSignificant(String pAttributeName) {
-        pAttributeName = significantOrNull(pAttributeName);
-        if (pAttributeName == null) {
-            throw new IllegalArgumentException("No Attribute Name provided");
+    protected String assertAttributeNameSignificant( String pAttributeName ) {
+        pAttributeName = significantOrNull( pAttributeName );
+        if ( pAttributeName == null ) {
+            throw new IllegalArgumentException( "No Attribute Name provided" );
         }
         return pAttributeName;
     }
 
-    protected String significantOrNull(String pStr) {
-        if (pStr != null) {
+    protected String significantOrNull( String pStr ) {
+        if ( pStr != null ) {
             pStr = pStr.trim();
-            if (!pStr.isEmpty()) {
+            if ( !pStr.isEmpty() ) {
                 return pStr;
             }
         }
@@ -64,7 +64,7 @@ public class Validation {
     protected static abstract class AbstractWithErrors extends Validation {
         protected final Validation mNext;
 
-        private AbstractWithErrors(Validation pNext) {
+        private AbstractWithErrors( Validation pNext ) {
             mNext = pNext;
         }
 
@@ -74,27 +74,27 @@ public class Validation {
         }
 
         @Override
-        public boolean hasErrorForAttribute(String pAttributeName) {
-            return mNext.hasErrorForAttribute(pAttributeName);
+        public boolean hasErrorForAttribute( String pAttributeName ) {
+            return mNext.hasErrorForAttribute( pAttributeName );
         }
 
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            appendError(sb, 0);
+            appendError( sb, 0 );
             return sb.toString();
         }
 
-        protected StringBuilder indent(StringBuilder sb, int pIndent) {
-            while (pIndent-- > 0) {
-                sb.append(' ');
+        protected StringBuilder indent( StringBuilder sb, int pIndent ) {
+            while ( pIndent-- > 0 ) {
+                sb.append( ' ' );
             }
             return sb;
         }
 
-        protected StringBuilder addNewLine(StringBuilder sb) {
-            if (sb.length() != 0) {
-                sb.append('\n');
+        protected StringBuilder addNewLine( StringBuilder sb ) {
+            if ( sb.length() != 0 ) {
+                sb.append( '\n' );
             }
             return sb;
         }
@@ -103,18 +103,18 @@ public class Validation {
     protected static abstract class AbstractWithErroredAttribute extends AbstractWithErrors {
         private final String mAttributeName;
 
-        private AbstractWithErroredAttribute(Validation pNext, String pAttributeName) {
-            super(pNext);
+        private AbstractWithErroredAttribute( Validation pNext, String pAttributeName ) {
+            super( pNext );
             mAttributeName = pAttributeName;
         }
 
         @Override
-        public boolean hasErrorForAttribute(String pAttributeName) {
-            return (mAttributeName.equals(pAttributeName)) || super.hasErrorForAttribute(pAttributeName);
+        public boolean hasErrorForAttribute( String pAttributeName ) {
+            return (mAttributeName.equals( pAttributeName )) || super.hasErrorForAttribute( pAttributeName );
         }
 
-        protected int addAttributeName(StringBuilder sb, int pIndent) {
-            indent(addNewLine(sb), pIndent).append(mAttributeName).append(" - ");
+        protected int addAttributeName( StringBuilder sb, int pIndent ) {
+            indent( addNewLine( sb ), pIndent ).append( mAttributeName ).append( " - " );
             return mAttributeName.length() + 3;
         }
     }
@@ -122,48 +122,48 @@ public class Validation {
     private static class WithTextErrors extends AbstractWithErroredAttribute {
         private final String mError;
 
-        private WithTextErrors(Validation pNext, String pAttributeName, String pError) {
-            super(pNext, pAttributeName);
+        private WithTextErrors( Validation pNext, String pAttributeName, String pError ) {
+            super( pNext, pAttributeName );
             this.mError = pError;
         }
 
         @Override
-        protected void appendError(StringBuilder sb, int pIndent) {
-            addAttributeName(sb, pIndent);
-            mNext.appendError(sb.append(mError), pIndent);
+        protected void appendError( StringBuilder sb, int pIndent ) {
+            addAttributeName( sb, pIndent );
+            mNext.appendError( sb.append( mError ), pIndent );
         }
     }
 
     private static class WithValidationErrors extends AbstractWithErroredAttribute {
         private final Validation mValidationError;
 
-        private WithValidationErrors(Validation pNext, String pAttributeName, Validation pValidationError) {
-            super(pNext, pAttributeName);
+        private WithValidationErrors( Validation pNext, String pAttributeName, Validation pValidationError ) {
+            super( pNext, pAttributeName );
             mValidationError = pValidationError;
         }
 
         @Override
-        protected void appendError(StringBuilder sb, int pIndent) {
-            int zChildIndent = pIndent + addAttributeName(sb, pIndent);
+        protected void appendError( StringBuilder sb, int pIndent ) {
+            int zChildIndent = pIndent + addAttributeName( sb, pIndent );
 
-            mValidationError.appendError(sb, zChildIndent );
+            mValidationError.appendError( sb, zChildIndent );
 
-            mNext.appendError(sb, pIndent);
+            mNext.appendError( sb, pIndent );
         }
     }
 
     private static class ErroredClass extends AbstractWithErrors {
         private final String mClassName;
 
-        private ErroredClass(Validation pNext, String pClassName) {
-            super(pNext);
+        private ErroredClass( Validation pNext, String pClassName ) {
+            super( pNext );
             mClassName = pClassName;
         }
 
         @Override
-        protected void appendError(StringBuilder sb, int pIndent) {
-            sb.append(mClassName).append(" errors:");
-            mNext.appendError(sb, pIndent + INDENT_DEPTH);
+        protected void appendError( StringBuilder sb, int pIndent ) {
+            sb.append( mClassName ).append( " errors:" );
+            mNext.appendError( sb, pIndent + INDENT_DEPTH );
         }
     }
 }

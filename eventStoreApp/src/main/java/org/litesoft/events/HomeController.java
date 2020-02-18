@@ -14,6 +14,6 @@ public class HomeController {
 
     @GetMapping(value = "/")
     public String index() {
-        return "Hello (From EventStore vs " + mVersion +                ")";
+        return "Hello (From EventStore vs " + mVersion + ")";
     }
 }

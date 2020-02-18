@@ -7,34 +7,34 @@ import java.util.List;
 
 public class AbstractAllEventPropertiesMD<T extends AbstractAllEventProperties<T>> extends AbstractCommonEventPropertiesMD<T> {
 
-    private final NamedFunction<T> nf_id = nf("id", AbstractAllEventProperties::getId);
+    private final NamedFunction<T> nf_id = nf( "id", AbstractAllEventProperties::getId );
 
     protected final NamedFunction<T> getId() {
         return nf_id;
     }
 
     @Override
-    protected void collectEqualsSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
+    protected void collectEqualsSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
                 , getId()
         );
 
-        super.collectEqualsSuppliers(pCollector);
+        super.collectEqualsSuppliers( pCollector );
     }
 
     @Override
-    protected void collectHashCodeSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
+    protected void collectHashCodeSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
                 , getId()
         );
     }
 
     @Override
-    protected void collectToStringSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
+    protected void collectToStringSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
                 , getId()
         );
 
-        super.collectToStringSuppliers(pCollector);
+        super.collectToStringSuppliers( pCollector );
     }
 }

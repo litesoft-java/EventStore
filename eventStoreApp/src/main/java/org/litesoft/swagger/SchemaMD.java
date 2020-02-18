@@ -15,9 +15,9 @@ public class SchemaMD<T extends Schema<T>> {
 
     public final List<NamedFunction<T>> getEqualsSuppliers() {
         List<NamedFunction<T>> zList = mEqualsSuppliers;
-        if (zList == null) {
+        if ( zList == null ) {
             zList = new ArrayList<>();
-            collectEqualsSuppliers(zList);
+            collectEqualsSuppliers( zList );
             mEqualsSuppliers = zList;
         }
         return zList;
@@ -25,9 +25,9 @@ public class SchemaMD<T extends Schema<T>> {
 
     public final List<NamedFunction<T>> getHashCodeSuppliers() {
         List<NamedFunction<T>> zList = mHashCodeSuppliers;
-        if (zList == null) {
+        if ( zList == null ) {
             zList = new ArrayList<>();
-            collectHashCodeSuppliers(zList);
+            collectHashCodeSuppliers( zList );
             mHashCodeSuppliers = zList;
         }
         return zList;
@@ -35,9 +35,9 @@ public class SchemaMD<T extends Schema<T>> {
 
     public final List<NamedFunction<T>> getRequiredSuppliers() {
         List<NamedFunction<T>> zList = mRequiredSuppliers;
-        if (zList == null) {
+        if ( zList == null ) {
             zList = new ArrayList<>();
-            collectRequiredSuppliers(zList);
+            collectRequiredSuppliers( zList );
             mRequiredSuppliers = zList;
         }
         return zList;
@@ -45,28 +45,27 @@ public class SchemaMD<T extends Schema<T>> {
 
     public final List<NamedFunction<T>> getToStringSuppliers() {
         List<NamedFunction<T>> zList = mToStringSuppliers;
-        if (zList == null) {
+        if ( zList == null ) {
             zList = new ArrayList<>();
-            collectToStringSuppliers(zList);
+            collectToStringSuppliers( zList );
             mToStringSuppliers = zList;
         }
         return zList;
     }
 
-
-    protected void collectEqualsSuppliers(List<NamedFunction<T>> pCollector) {
+    protected void collectEqualsSuppliers( List<NamedFunction<T>> pCollector ) {
     }
 
-    protected void collectHashCodeSuppliers(List<NamedFunction<T>> pCollector) {
+    protected void collectHashCodeSuppliers( List<NamedFunction<T>> pCollector ) {
     }
 
-    protected void collectRequiredSuppliers(List<NamedFunction<T>> pCollector) {
+    protected void collectRequiredSuppliers( List<NamedFunction<T>> pCollector ) {
     }
 
-    protected void collectToStringSuppliers(List<NamedFunction<T>> pCollector) {
+    protected void collectToStringSuppliers( List<NamedFunction<T>> pCollector ) {
     }
 
-    protected NamedFunction<T> nf(String pName, Function<T, Object> pFunction) {
-        return new NamedFunction<>(pName, pFunction);
+    protected NamedFunction<T> nf( String pName, Function<T, Object> pFunction ) {
+        return new NamedFunction<>( pName, pFunction );
     }
 }

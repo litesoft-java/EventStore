@@ -26,18 +26,18 @@ public class PageEvents extends Schema<PageEvents> {
     @Valid
     private List<ReturnedEvent> data;
 
-    public PageEvents(List<ReturnedEvent> data, String nextToken) {
+    public PageEvents( List<ReturnedEvent> data, String nextToken ) {
         this.nextToken = nextToken;
         this.data = data;
     }
 
     public PageEvents() {
-        this(null, null);
+        this( null, null );
     }
 
-    public static PageEvents from(PageData<ReturnedEvent> pageData) {
+    public static PageEvents from( PageData<ReturnedEvent> pageData ) {
         return (pageData == null) ? new PageEvents() :
-                new PageEvents(pageData.getData(), pageData.getNextToken());
+               new PageEvents( pageData.getData(), pageData.getNextToken() );
     }
 
     @Override
@@ -45,7 +45,7 @@ public class PageEvents extends Schema<PageEvents> {
         return PageEventsMD.INSTANCE;
     }
 
-    public PageEvents nextToken(String nextToken) {
+    public PageEvents nextToken( String nextToken ) {
         this.nextToken = nextToken;
         return this;
     }
@@ -61,20 +61,20 @@ public class PageEvents extends Schema<PageEvents> {
         return nextToken;
     }
 
-    public void setNextToken(String nextToken) {
+    public void setNextToken( String nextToken ) {
         this.nextToken = nextToken;
     }
 
-    public PageEvents data(List<ReturnedEvent> data) {
+    public PageEvents data( List<ReturnedEvent> data ) {
         this.data = data;
         return this;
     }
 
-    public PageEvents addDataItem(ReturnedEvent dataItem) {
-        if (this.data == null) {
+    public PageEvents addDataItem( ReturnedEvent dataItem ) {
+        if ( this.data == null ) {
             this.data = new ArrayList<ReturnedEvent>();
         }
-        this.data.add(dataItem);
+        this.data.add( dataItem );
         return this;
     }
 
@@ -89,7 +89,7 @@ public class PageEvents extends Schema<PageEvents> {
         return data;
     }
 
-    public void setData(List<ReturnedEvent> data) {
+    public void setData( List<ReturnedEvent> data ) {
         this.data = data;
     }
 }

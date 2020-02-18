@@ -7,13 +7,13 @@ import org.litesoft.restish.support.PageData;
 import org.litesoft.restish.support.auth.AuthorizePair;
 
 public interface V01_EventsStore {
-    PageData<ReturnedEvent> latestEvents(AuthorizePair pAuthorizePair, String pUser, int pLimit);
+    PageData<ReturnedEvent> latestEvents( AuthorizePair pAuthorizePair, String pUser, int pLimit );
 
-    ReturnedEvent createEvent(AuthorizePair pAuthorizePair, CreateEvent pEvent);
+    ReturnedEvent createEvent( AuthorizePair pAuthorizePair, CreateEvent pEvent );
 
-    ReturnedEvent deleteEvent(AuthorizePair pAuthorizePair, String pID);
+    ReturnedEvent deleteEvent( AuthorizePair pAuthorizePair, String pID );
 
-    ReturnedEvent readEvent(AuthorizePair pAuthorizePair, String pID);
+    ReturnedEvent readEvent( AuthorizePair pAuthorizePair, String pID );
 
-    ReturnedEvent updateEvent(AuthorizePair pAuthorizePair, UpdateEvent pEvent);
+    ReturnedEvent updateEvent( AuthorizePair pAuthorizePair, UpdateEvent pEvent );
 }

@@ -1,13 +1,13 @@
 package org.litesoft.persisted;
 
 public class NextPageToken {
-  private final String mEncodedToken;
+    private final String mEncodedToken;
 
-  public NextPageToken( String pEncodedToken ) {
-    mEncodedToken = pEncodedToken;
-  }
+    public NextPageToken( String pEncodedToken ) {
+        mEncodedToken = pEncodedToken;
+    }
 
-  public String getEncodedToken() {
-    return mEncodedToken;
-  }
+    public String getEncodedToken() {
+        return mEncodedToken;
+    }
 }

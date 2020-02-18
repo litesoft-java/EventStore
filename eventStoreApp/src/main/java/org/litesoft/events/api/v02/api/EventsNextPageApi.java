@@ -23,11 +23,10 @@ public interface EventsNextPageApi {
     @RequestMapping(value = "/events-nextPage/{nextToken}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<PageEvents> nextEvents(@ApiParam(value = "a 'cursor' for retreiving the next page of Events.", required = true)
-                                          @PathVariable("nextToken")
-                                                  String nextToken,
-                                          @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
-                                          @Valid @RequestParam(value = "limit", required = false)
-                                                  Integer limit);
-
+    ResponseEntity<PageEvents> nextEvents( @ApiParam(value = "a 'cursor' for retreiving the next page of Events.", required = true)
+                                           @PathVariable("nextToken")
+                                                   String nextToken,
+                                           @Min(0) @Max(1000) @ApiParam(value = "Maximum number of records to return.", allowableValues = "")
+                                           @Valid @RequestParam(value = "limit", required = false)
+                                                   Integer limit );
 }

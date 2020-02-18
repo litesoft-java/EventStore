@@ -7,40 +7,40 @@ import java.util.List;
 
 public class AbstractAllEventPropertiesMD<T extends AbstractAllEventProperties<T>> extends AbstractCommonEventPropertiesMD<T> {
 
-    private final NamedFunction<T> nf_id = nf("id", AbstractAllEventProperties::getId);
-    private final NamedFunction<T> nf_updateToken = nf("updateToken", AbstractAllEventProperties::getUpdateToken);
+    private final NamedFunction<T> nf_id = nf( "id", AbstractAllEventProperties::getId );
+    private final NamedFunction<T> nf_updateToken = nf( "updateToken", AbstractAllEventProperties::getUpdateToken );
 
-    protected final NamedFunction<T> getId() {
+    public final NamedFunction<T> nfId() {
         return nf_id;
     }
 
-    protected final NamedFunction<T> getUpdateToken() {
+    public final NamedFunction<T> nfUpdateToken() {
         return nf_updateToken;
     }
 
     @Override
-    protected void collectEqualsSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
-                , getId()
+    protected void collectEqualsSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
+                , nfId()
         );
 
-        super.collectEqualsSuppliers(pCollector);
+        super.collectEqualsSuppliers( pCollector );
     }
 
     @Override
-    protected void collectHashCodeSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
-                , getId()
+    protected void collectHashCodeSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
+                , nfId()
         );
     }
 
     @Override
-    protected void collectToStringSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
-                , getId()
-                , getUpdateToken()
+    protected void collectToStringSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
+                , nfId()
+                , nfUpdateToken()
         );
 
-        super.collectToStringSuppliers(pCollector);
+        super.collectToStringSuppliers( pCollector );
     }
 }

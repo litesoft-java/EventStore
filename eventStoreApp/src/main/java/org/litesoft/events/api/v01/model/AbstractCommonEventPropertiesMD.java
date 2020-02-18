@@ -8,10 +8,10 @@ import java.util.List;
 
 public class AbstractCommonEventPropertiesMD<T extends AbstractCommonEventProperties<T>> extends SchemaMD<T> {
 
-    private final NamedFunction<T> nf_user = nf("user", AbstractCommonEventProperties::getUser);
-    private final NamedFunction<T> nf_what = nf("what", AbstractCommonEventProperties::getWhat);
-    private final NamedFunction<T> nf_when = nf("when", AbstractCommonEventProperties::getWhen);
-    private final NamedFunction<T> nf_where = nf("where", AbstractCommonEventProperties::getWhere);
+    private final NamedFunction<T> nf_user = nf( "user", AbstractCommonEventProperties::getUser );
+    private final NamedFunction<T> nf_what = nf( "what", AbstractCommonEventProperties::getWhat );
+    private final NamedFunction<T> nf_when = nf( "when", AbstractCommonEventProperties::getWhen );
+    private final NamedFunction<T> nf_where = nf( "where", AbstractCommonEventProperties::getWhere );
 
     protected final NamedFunction<T> getUser() {
         return nf_user;
@@ -30,33 +30,33 @@ public class AbstractCommonEventPropertiesMD<T extends AbstractCommonEventProper
     }
 
     @Override
-    protected void collectEqualsSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
+    protected void collectEqualsSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
                 , getUser()
                 , getWhat()
                 , getWhen()
                 , getWhere()
         );
 
-        super.collectRequiredSuppliers(pCollector);
+        super.collectRequiredSuppliers( pCollector );
     }
 
     @Override
-    protected void collectHashCodeSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
+    protected void collectHashCodeSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
                 , getUser()
         );
     }
 
     @Override
-    protected void collectToStringSuppliers(List<NamedFunction<T>> pCollector) {
-        Collections.addAll(pCollector
+    protected void collectToStringSuppliers( List<NamedFunction<T>> pCollector ) {
+        Collections.addAll( pCollector
                 , getUser()
                 , getWhat()
                 , getWhen()
                 , getWhere()
         );
 
-        super.collectRequiredSuppliers(pCollector);
+        super.collectRequiredSuppliers( pCollector );
     }
 }

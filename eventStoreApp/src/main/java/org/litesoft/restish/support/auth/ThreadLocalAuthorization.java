@@ -4,8 +4,8 @@ public class ThreadLocalAuthorization implements Authorization {
     private final ThreadLocal<AuthorizePair> mThreadLocalAuthorizePair = new ThreadLocal<>();
 
     @Override
-    public void set(AuthorizePair pair) {
-        mThreadLocalAuthorizePair.set(pair);
+    public void set( AuthorizePair pair ) {
+        mThreadLocalAuthorizePair.set( pair );
     }
 
     @Override

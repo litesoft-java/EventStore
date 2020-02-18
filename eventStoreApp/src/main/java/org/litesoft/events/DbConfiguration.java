@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DbConfiguration {
-  @Bean
-  TransactionalProxy createTransactionalProxy() {
-    return new TransactionalProxy();
-  }
+    @Bean
+    TransactionalProxy createTransactionalProxy() {
+        return new TransactionalProxy();
+    }
 }

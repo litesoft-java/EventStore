@@ -1,5 +1,6 @@
 package org.litesoft.events.api.v02.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.litesoft.swagger.Schema;
@@ -8,6 +9,7 @@ import org.litesoft.swagger.Schema;
  * AbstractCommonEventProperties
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-02-06T00:19:01.940Z[GMT]")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractCommonEventProperties<T extends AbstractCommonEventProperties<T>> extends Schema<T> {
     @JsonProperty("user")
     private String user = null;
@@ -24,7 +26,7 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @JsonProperty("done")
     private Boolean done = null;
 
-    public T user(String user) {
+    public T user( String user ) {
         this.user = user;
         return us();
     }
@@ -40,11 +42,11 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser( String user ) {
         this.user = user;
     }
 
-    public T what(String what) {
+    public T what( String what ) {
         this.what = what;
         return us();
     }
@@ -60,11 +62,11 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
         return what;
     }
 
-    public void setWhat(String what) {
+    public void setWhat( String what ) {
         this.what = what;
     }
 
-    public T when(String when) {
+    public T when( String when ) {
         this.when = when;
         return us();
     }
@@ -80,11 +82,11 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
         return when;
     }
 
-    public void setWhen(String when) {
+    public void setWhen( String when ) {
         this.when = when;
     }
 
-    public T where(String where) {
+    public T where( String where ) {
         this.where = where;
         return us();
     }
@@ -100,11 +102,11 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
         return where;
     }
 
-    public void setWhere(String where) {
+    public void setWhere( String where ) {
         this.where = where;
     }
 
-    public T done(Boolean done) {
+    public T done( Boolean done ) {
         this.done = done;
         return us();
     }
@@ -120,7 +122,7 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
         return done;
     }
 
-    public void setDone(Boolean done) {
+    public void setDone( Boolean done ) {
         this.done = done;
     }
 }

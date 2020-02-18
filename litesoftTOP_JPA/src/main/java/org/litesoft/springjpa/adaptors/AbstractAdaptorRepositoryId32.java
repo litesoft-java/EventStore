@@ -9,17 +9,17 @@ import org.litesoft.persisted.POMetaData;
 @SuppressWarnings("unused")
 public abstract class AbstractAdaptorRepositoryId32<T extends IPersistedObjectId32, B extends POBuilder<T>, CT extends T>
         extends AbstractAdaptorRepository<Integer, T, B, CT> implements IPersistedObjectRepositoryId32<T> {
-  private final SpringRepositoryId32<CT> mRepository;
+    private final SpringRepositoryId32<CT> mRepository;
 
-  protected AbstractAdaptorRepositoryId32( Class<CT> pClassCT, POMetaData<T, B> pMetaData,
-                                           SpringRepositoryId32<CT> pRepository, TransactionalProxy pTransactionalProxy,
-                                           IPersistedObject... pAdditionalInstanceTypes ) {
-    super( pClassCT, pMetaData, pRepository, pTransactionalProxy, pAdditionalInstanceTypes );
-    mRepository = pRepository;
-  }
+    protected AbstractAdaptorRepositoryId32( Class<CT> pClassCT, POMetaData<T, B> pMetaData,
+                                             SpringRepositoryId32<CT> pRepository, TransactionalProxy pTransactionalProxy,
+                                             IPersistedObject... pAdditionalInstanceTypes ) {
+        super( pClassCT, pMetaData, pRepository, pTransactionalProxy, pAdditionalInstanceTypes );
+        mRepository = pRepository;
+    }
 
-  @Override
-  public T findById( Integer pId ) {
-    return (pId == null) ? null : disconnect( mRepository.findById( pId ) );
-  }
+    @Override
+    public T findById( Integer pId ) {
+        return (pId == null) ? null : disconnect( mRepository.findById( pId ) );
+    }
 }

@@ -13,12 +13,12 @@ public class CreateEventMD extends AbstractCommonEventPropertiesMD<CreateEvent> 
     }
 
     @Override
-    protected void collectRequiredSuppliers(List<NamedFunction<CreateEvent>> pCollector) {
-        Collections.addAll(pCollector
+    protected void collectRequiredSuppliers( List<NamedFunction<CreateEvent>> pCollector ) {
+        Collections.addAll( pCollector
                 , getUser()
                 , getWhat()
         );
 
-        super.collectRequiredSuppliers(pCollector);
+        super.collectRequiredSuppliers( pCollector );
     }
 }

@@ -1,8 +1,10 @@
 package org.litesoft.events.api.v03.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
-import org.litesoft.swagger.Schema;
+import org.litesoft.alleviative.beans.SetValue;
+import org.litesoft.swagger.MappedSchema;
+import org.litesoft.swagger.SchemaMD;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -10,37 +12,14 @@ import org.springframework.validation.annotation.Validated;
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-02-11T00:44:24.775Z[GMT]")
-public abstract class AbstractCommonEventProperties<T extends AbstractCommonEventProperties<T>> extends Schema<T> {
-    @JsonProperty("user")
-    private String user = null;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class AbstractCommonEventProperties<T extends AbstractCommonEventProperties<T>> extends MappedSchema<T> {
 
-    @JsonProperty("what")
-    private String what = null;
+    protected abstract AbstractCommonEventPropertiesMD<T> abstractCommonEventPropertiesMD();
 
-    @JsonProperty("when")
-    private String when = null;
-
-    @JsonProperty("localTimeOffset")
-    private Integer localTimeOffset = null;
-
-    @JsonProperty("localTzName")
-    private String localTzName = null;
-
-    @JsonProperty("where")
-    private String where = null;
-
-    @JsonProperty("billable")
-    private Boolean billable = null;
-
-    @JsonProperty("client")
-    private String client = null;
-
-    @JsonProperty("done")
-    private Boolean done = null;
-
-    public T user(String user) {
-        this.user = user;
-        return us();
+    @Override
+    protected final SchemaMD<T> schemaMD() {
+        return abstractCommonEventPropertiesMD();
     }
 
     /**
@@ -51,15 +30,19 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @ApiModelProperty(example = "your.name@your-company.com", value = "Unique (when combined with 'when').")
 
     public String getUser() {
-        return user;
+        return fieldGet( abstractCommonEventPropertiesMD().nfUser() );
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUser( String pUser ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfUser(), pUser );
     }
 
-    public T what(String what) {
-        this.what = what;
+    public SetValue<String> onUser() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfUser() );
+    }
+
+    public T withUser( String pUser ) {
+        setUser( pUser );
         return us();
     }
 
@@ -71,15 +54,19 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @ApiModelProperty(example = "Lunch", value = "")
 
     public String getWhat() {
-        return what;
+        return fieldGet( abstractCommonEventPropertiesMD().nfWhat() );
     }
 
-    public void setWhat(String what) {
-        this.what = what;
+    public void setWhat( String pWhat ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfWhat(), pWhat );
     }
 
-    public T when(String when) {
-        this.when = when;
+    public SetValue<String> onWhat() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfWhat() );
+    }
+
+    public T withWhat( String pWhat ) {
+        setWhat( pWhat );
         return us();
     }
 
@@ -91,15 +78,19 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @ApiModelProperty(example = "2020-01-15T17:08Z", value = "As these are Human events, minute resolution is all that is supported.  Unique (when combined with 'user').")
 
     public String getWhen() {
-        return when;
+        return fieldGet( abstractCommonEventPropertiesMD().nfWhen() );
     }
 
-    public void setWhen(String when) {
-        this.when = when;
+    public void setWhen( String pWhen ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfWhen(), pWhen );
     }
 
-    public T localTimeOffset(Integer localTimeOffset) {
-        this.localTimeOffset = localTimeOffset;
+    public SetValue<String> onWhen() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfWhen() );
+    }
+
+    public T withWhen( String pWhen ) {
+        setWhen( pWhen );
         return us();
     }
 
@@ -111,15 +102,19 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @ApiModelProperty(example = "-480", value = "informational")
 
     public Integer getLocalTimeOffset() {
-        return localTimeOffset;
+        return fieldGet( abstractCommonEventPropertiesMD().nfLocalTimeOffset() );
     }
 
-    public void setLocalTimeOffset(Integer localTimeOffset) {
-        this.localTimeOffset = localTimeOffset;
+    public void setLocalTimeOffset( Integer pLocalTimeOffset ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfLocalTimeOffset(), pLocalTimeOffset );
     }
 
-    public T localTzName(String localTzName) {
-        this.localTzName = localTzName;
+    public SetValue<Integer> onLocalTimeOffset() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfLocalTimeOffset() );
+    }
+
+    public T withLocalTimeOffset( Integer pLocalTimeOffset ) {
+        setLocalTimeOffset( pLocalTimeOffset );
         return us();
     }
 
@@ -131,15 +126,19 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @ApiModelProperty(example = "PT", value = "informational")
 
     public String getLocalTzName() {
-        return localTzName;
+        return fieldGet( abstractCommonEventPropertiesMD().nfLocalTzName() );
     }
 
-    public void setLocalTzName(String localTzName) {
-        this.localTzName = localTzName;
+    public void setLocalTzName( String pLocalTzName ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfLocalTzName(), pLocalTzName );
     }
 
-    public T where(String where) {
-        this.where = where;
+    public SetValue<String> onLocalTzName() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfLocalTzName() );
+    }
+
+    public T withLocalTzName( String pLocalTzName ) {
+        setLocalTzName( pLocalTzName );
         return us();
     }
 
@@ -151,15 +150,19 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @ApiModelProperty(example = "Woodinville", value = "informational")
 
     public String getWhere() {
-        return where;
+        return fieldGet( abstractCommonEventPropertiesMD().nfWhere() );
     }
 
-    public void setWhere(String where) {
-        this.where = where;
+    public void setWhere( String pWhere ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfWhere(), pWhere );
     }
 
-    public T billable(Boolean billable) {
-        this.billable = billable;
+    public SetValue<String> onWhere() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfWhere() );
+    }
+
+    public T withWhere( String pWhere ) {
+        setWhere( pWhere );
         return us();
     }
 
@@ -170,16 +173,20 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
      **/
     @ApiModelProperty(example = "true", value = "if TRUE then 'client' is required")
 
-    public Boolean isBillable() {
-        return billable;
+    public Boolean getBillable() {
+        return fieldGet( abstractCommonEventPropertiesMD().nfBillable() );
     }
 
-    public void setBillable(Boolean billable) {
-        this.billable = billable;
+    public void setBillable( Boolean pBillable ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfBillable(), pBillable );
     }
 
-    public T client(String client) {
-        this.client = client;
+    public SetValue<Boolean> onBillable() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfBillable() );
+    }
+
+    public T withBillable( Boolean pBillable ) {
+        setBillable( pBillable );
         return us();
     }
 
@@ -191,15 +198,19 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @ApiModelProperty(example = "Fred's Market", value = "Used for possible Billing")
 
     public String getClient() {
-        return client;
+        return fieldGet( abstractCommonEventPropertiesMD().nfClient() );
     }
 
-    public void setClient(String client) {
-        this.client = client;
+    public void setClient( String pClient ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfClient(), pClient );
     }
 
-    public T done(Boolean done) {
-        this.done = done;
+    public SetValue<String> onClient() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfClient() );
+    }
+
+    public T withClient( String pClient ) {
+        setClient( pClient );
         return us();
     }
 
@@ -210,11 +221,20 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
      **/
     @ApiModelProperty(example = "false", value = "if TRUE, then Billable can't be TRUE. TRUE means that this Event is not tracked and hence may NOT have a limited window size (like a 4 hour Lunch).")
 
-    public Boolean isDone() {
-        return done;
+    public Boolean getDone() {
+        return fieldGet( abstractCommonEventPropertiesMD().nfDone() );
     }
 
-    public void setDone(Boolean done) {
-        this.done = done;
+    public void setDone( Boolean pDone ) {
+        fieldSet( abstractCommonEventPropertiesMD().nfDone(), pDone );
+    }
+
+    public SetValue<Boolean> onDone() {
+        return fieldGetSetValue( abstractCommonEventPropertiesMD().nfDone() );
+    }
+
+    public T withDone( Boolean pDone ) {
+        setDone( pDone );
+        return us();
     }
 }

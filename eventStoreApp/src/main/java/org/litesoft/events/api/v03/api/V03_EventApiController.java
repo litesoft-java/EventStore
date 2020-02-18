@@ -23,44 +23,43 @@ import javax.validation.Valid;
 @SuppressWarnings({"unused", "DefaultAnnotationParam", "MVCPathVariableInspection"})
 public class V03_EventApiController extends AbstractRestishController<ReturnedEvent> implements EventApi {
 
-    private static final Logger log = LoggerFactory.getLogger(V03_EventApiController.class);
+    private static final Logger log = LoggerFactory.getLogger( V03_EventApiController.class );
 
     private final V03_EventsStore mStore;
 
-    public V03_EventApiController(Authorization pAuthorization, V03_EventsStore pStore) {
-        super(pAuthorization);
+    public V03_EventApiController( Authorization pAuthorization, V03_EventsStore pStore ) {
+        super( pAuthorization );
         mStore = pStore;
     }
 
     @Override
-    public ResponseEntity<ReturnedEvent> createEvent(@ApiParam(value = "Event to create", required = true)
-                                                     @Valid @RequestBody
-                                                             CreateEvent body) {
-        return process(HttpStatus.CREATED, () -> mStore.createEvent(authorizePair(), body));
+    public ResponseEntity<ReturnedEvent> createEvent( @ApiParam(value = "Event to create", required = true)
+                                                      @Valid @RequestBody
+                                                              CreateEvent body ) {
+        return process( HttpStatus.CREATED, () -> mStore.createEvent( authorizePair(), body ) );
     }
 
     @Override
-    public ResponseEntity<ReturnedEvent> deleteEvent(@ApiParam(value = "", required = true)
-                                                     @PathVariable("updateToken")
-                                                             String updateToken) {
-        return process(() -> mStore.deleteEvent(authorizePair(), updateToken));
+    public ResponseEntity<ReturnedEvent> deleteEvent( @ApiParam(value = "", required = true)
+                                                      @PathVariable("updateToken")
+                                                              String updateToken ) {
+        return process( () -> mStore.deleteEvent( authorizePair(), updateToken ) );
     }
 
     @Override
-    public ResponseEntity<ReturnedEvent> readEvent(@ApiParam(value = "", required = true)
-                                                   @PathVariable("id")
-                                                           String id) {
-        return process(() -> mStore.readEvent(authorizePair(), id));
+    public ResponseEntity<ReturnedEvent> readEvent( @ApiParam(value = "", required = true)
+                                                    @PathVariable("id")
+                                                            String id ) {
+        return process( () -> mStore.readEvent( authorizePair(), id ) );
     }
 
     @Override
-    public ResponseEntity<ReturnedEvent> updateEvent(@ApiParam(value = "Event changes to patch", required = true)
-                                                     @Valid @RequestBody
-                                                             PatchEvent body,
-                                                     @ApiParam(value = "", required = true)
-                                                     @PathVariable("updateToken")
-                                                             String updateToken) {
-        return process(() -> mStore.updateEvent(authorizePair(), updateToken, body));
+    public ResponseEntity<ReturnedEvent> updateEvent( @ApiParam(value = "Event changes to patch", required = true)
+                                                      @Valid @RequestBody
+                                                              PatchEvent body,
+                                                      @ApiParam(value = "", required = true)
+                                                      @PathVariable("updateToken")
+                                                              String updateToken ) {
+        return process( () -> mStore.updateEvent( authorizePair(), updateToken, body ) );
     }
-
 }

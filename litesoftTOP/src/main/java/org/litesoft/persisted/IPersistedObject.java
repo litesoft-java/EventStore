@@ -2,11 +2,11 @@ package org.litesoft.persisted;
 
 @SuppressWarnings("rawtypes")
 public interface IPersistedObject {
-  Class getDisplayType();
+    Class getDisplayType();
 
-  void assertCanInsert();
+    void assertCanInsert();
 
-  void assertCanUpdate();
+    void assertCanUpdate();
 
-  void assertCanDelete();
+    void assertCanDelete();
 }

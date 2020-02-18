@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-02-11T00:44:24.775Z[GMT]")
 public class ReturnedEvent extends AbstractAllEventProperties<ReturnedEvent> {
     @Override
-    protected SchemaMD<ReturnedEvent> schemaMD() {
+    protected AbstractAllEventPropertiesMD<ReturnedEvent> abstractAllEventPropertiesMD() {
         return ReturnedEventMD.INSTANCE;
     }
 }

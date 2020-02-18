@@ -7,18 +7,18 @@ public class PageData<T> {
     private final String mNextToken;
     private final List<T> mData;
 
-    public PageData(List<T> pData, String pNextToken) {
+    public PageData( List<T> pData, String pNextToken ) {
         mData = pData;
         mNextToken = pNextToken;
     }
 
-    public PageData(List<T> pData) {
-        this(pData, null);
+    public PageData( List<T> pData ) {
+        this( pData, null );
     }
 
     @SafeVarargs
-    public PageData(T... pData) {
-        this(Arrays.asList(pData));
+    public PageData( T... pData ) {
+        this( Arrays.asList( pData ) );
     }
 
     public String getNextToken() {
@@ -32,8 +32,8 @@ public class PageData<T> {
     @Override
     public String toString() {
         return "PageData{" +
-                "mNextToken='" + mNextToken + '\'' +
-                ", mData=" + mData +
-                '}';
+               "mNextToken='" + mNextToken + '\'' +
+               ", mData=" + mData +
+               '}';
     }
 }

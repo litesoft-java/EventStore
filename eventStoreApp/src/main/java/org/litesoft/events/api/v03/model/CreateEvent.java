@@ -1,7 +1,6 @@
 package org.litesoft.events.api.v03.model;
 
 import io.swagger.annotations.ApiModel;
-import org.litesoft.swagger.SchemaMD;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -12,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-02-11T00:44:24.775Z[GMT]")
 public class CreateEvent extends AbstractCommonEventProperties<CreateEvent> {
     @Override
-    protected SchemaMD<CreateEvent> schemaMD() {
+    protected AbstractCommonEventPropertiesMD<CreateEvent> abstractCommonEventPropertiesMD() {
         return CreateEventMD.INSTANCE;
     }
 }

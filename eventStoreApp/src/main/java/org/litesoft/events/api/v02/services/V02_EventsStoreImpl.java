@@ -22,108 +22,108 @@ import org.springframework.stereotype.Service;
 @Service
 public class V02_EventsStoreImpl extends AbstractEventStore implements V02_EventsStore {
 
-  private static final String[] PO_SUPPORTED_FIELDS = {
-          "User",
-          "What",
-          "When",
-          "Where",
-          "Done",
-          };
-  private static final String[] API_UNSUPPORTED_FIELDS = {
-          "LocalTimeOffset",
-          "LocalTzName",
-          "Billable",
-          "Client",
-          };
+    private static final String[] PO_SUPPORTED_FIELDS = {
+            "User",
+            "What",
+            "When",
+            "Where",
+            "Done",
+            };
+    private static final String[] API_UNSUPPORTED_FIELDS = {
+            "LocalTimeOffset",
+            "LocalTzName",
+            "Billable",
+            "Client",
+            };
 
-  public V02_EventsStoreImpl( EventLogRepository pRepository ) {
-    super( "v02", pRepository, EventLogPO.META_DATA, PO_SUPPORTED_FIELDS, API_UNSUPPORTED_FIELDS );
-  }
-
-  @Override
-  public PageData<ReturnedEvent> latestEvents( AuthorizePair pAuthorizePair, String pUser, int pLimit ) {
-    Page<EventLogPO> zPage = firstPage( pAuthorizePair, pUser, pLimit );
-    return map( zPage );
-  }
-
-  @Override
-  public PageData<ReturnedEvent> nextEvents( AuthorizePair pAuthorizePair, String pNextToken, Integer pLimit_inheritIfNull ) {
-    Page<EventLogPO> zPage = nextPage( pAuthorizePair, pNextToken, pLimit_inheritIfNull );
-    return map( zPage );
-  }
-
-  private PageData<ReturnedEvent> map(Page<EventLogPO> zPage) {
-    List<EventLogPO> zPOs = NotNull.or( zPage.getPOs(), Collections.emptyList() );
-    List<ReturnedEvent> zData = zPOs.stream().map( this::mapPO2RE ).collect( Collectors.toList() );
-
-    NextPageToken zNextPageToken = zPage.getNextPageToken();
-    String zToken = (zNextPageToken == null) ? null : Significant.orNull( zNextPageToken.getEncodedToken() );
-    return new PageData<>( zData, zToken );
-  }
-
-  @Override
-  public ReturnedEvent createEvent( AuthorizePair pAuthorizePair, CreateEvent pEvent ) {
-    if ( pEvent == null ) {
-      return null;
+    public V02_EventsStoreImpl( EventLogRepository pRepository ) {
+        super( "v02", pRepository, EventLogPO.META_DATA, PO_SUPPORTED_FIELDS, API_UNSUPPORTED_FIELDS );
     }
 
-    EventLogPO zPO = EventLogPO.builder()
-            .withUser( pEvent.getUser() )
-            .withWhat( pEvent.getWhat() )
-            .withWhen( pEvent.getWhen() )
-            .withWhere( pEvent.getWhere() )
-            .withDone( pEvent.isDone() )
-            .build();
-
-    EventLogPO zInsertedPO = mRepository.insert( zPO );
-
-    return mapPO2RE( zInsertedPO );
-  }
-
-  @Override
-  public ReturnedEvent deleteEvent( AuthorizePair pAuthorizePair, String pID ) {
-    EventLogPO zPO = mRepository.findById( Significant.orNull( pID ) );
-    if ( zPO != null ) {
-      mRepository.delete( zPO );
+    @Override
+    public PageData<ReturnedEvent> latestEvents( AuthorizePair pAuthorizePair, String pUser, int pLimit ) {
+        Page<EventLogPO> zPage = firstPage( pAuthorizePair, pUser, pLimit );
+        return map( zPage );
     }
-    return mapPO2RE( zPO );
-  }
 
-  @Override
-  public ReturnedEvent readEvent( AuthorizePair pAuthorizePair, String pID ) {
-    return mapPO2RE( mRepository.findById( Significant.orNull( pID ) ) );
-  }
-
-  @Override
-  public ReturnedEvent updateEvent( AuthorizePair pAuthorizePair, UpdateEvent pEvent ) {
-    if ( pEvent == null ) {
-      return null;
+    @Override
+    public PageData<ReturnedEvent> nextEvents( AuthorizePair pAuthorizePair, String pNextToken, Integer pLimit_inheritIfNull ) {
+        Page<EventLogPO> zPage = nextPage( pAuthorizePair, pNextToken, pLimit_inheritIfNull );
+        return map( zPage );
     }
-    String zUser = requiredSignificantField( "User", pEvent.getUser() );
-    String zWhat = requiredSignificantField( "What", pEvent.getWhat() );
-    String zWhen = requiredSignificantField( "When", pEvent.getWhen() );
-    String zWhere = Significant.orNull( pEvent.getWhere() );
-    Boolean zDone = pEvent.isDone();
 
-    EventLogPO.Builder zBuilder = checkUpdateApiBasedChanges( pEvent.getId(),
-                                                              "User", zUser,
-                                                              "What", zWhat,
-                                                              "When", zWhen,
-                                                              "Where", zWhere,
-                                                              "Done", zDone );
-    EventLogPO zUpdated = update( zBuilder );
-    return mapPO2RE( zUpdated );
-  }
+    private PageData<ReturnedEvent> map( Page<EventLogPO> zPage ) {
+        List<EventLogPO> zPOs = NotNull.or( zPage.getPOs(), Collections.emptyList() );
+        List<ReturnedEvent> zData = zPOs.stream().map( this::mapPO2RE ).collect( Collectors.toList() );
 
-  private ReturnedEvent mapPO2RE( EventLogPO pPO ) {
-    return (pPO == null) ? null :
-           new ReturnedEvent()
-                   .id( pPO.getId() )
-                   .user( pPO.getUser() )
-                   .what( pPO.getWhat() )
-                   .when( pPO.getWhen() )
-                   .where( pPO.getWhere() )
-                   .done( pPO.getDone() )
-            ;
-  }
+        NextPageToken zNextPageToken = zPage.getNextPageToken();
+        String zToken = (zNextPageToken == null) ? null : Significant.orNull( zNextPageToken.getEncodedToken() );
+        return new PageData<>( zData, zToken );
+    }
+
+    @Override
+    public ReturnedEvent createEvent( AuthorizePair pAuthorizePair, CreateEvent pEvent ) {
+        if ( pEvent == null ) {
+            return null;
+        }
+
+        EventLogPO zPO = EventLogPO.builder()
+                .withUser( pEvent.getUser() )
+                .withWhat( pEvent.getWhat() )
+                .withWhen( pEvent.getWhen() )
+                .withWhere( pEvent.getWhere() )
+                .withDone( pEvent.isDone() )
+                .build();
+
+        EventLogPO zInsertedPO = mRepository.insert( zPO );
+
+        return mapPO2RE( zInsertedPO );
+    }
+
+    @Override
+    public ReturnedEvent deleteEvent( AuthorizePair pAuthorizePair, String pID ) {
+        EventLogPO zPO = mRepository.findById( Significant.orNull( pID ) );
+        if ( zPO != null ) {
+            mRepository.delete( zPO );
+        }
+        return mapPO2RE( zPO );
+    }
+
+    @Override
+    public ReturnedEvent readEvent( AuthorizePair pAuthorizePair, String pID ) {
+        return mapPO2RE( mRepository.findById( Significant.orNull( pID ) ) );
+    }
+
+    @Override
+    public ReturnedEvent updateEvent( AuthorizePair pAuthorizePair, UpdateEvent pEvent ) {
+        if ( pEvent == null ) {
+            return null;
+        }
+        String zUser = requiredSignificantField( "User", pEvent.getUser() );
+        String zWhat = requiredSignificantField( "What", pEvent.getWhat() );
+        String zWhen = requiredSignificantField( "When", pEvent.getWhen() );
+        String zWhere = Significant.orNull( pEvent.getWhere() );
+        Boolean zDone = pEvent.isDone();
+
+        EventLogPO.Builder zBuilder = checkUpdateApiBasedChanges( pEvent.getId(),
+                                                                  "User", zUser,
+                                                                  "What", zWhat,
+                                                                  "When", zWhen,
+                                                                  "Where", zWhere,
+                                                                  "Done", zDone );
+        EventLogPO zUpdated = update( zBuilder );
+        return mapPO2RE( zUpdated );
+    }
+
+    private ReturnedEvent mapPO2RE( EventLogPO pPO ) {
+        return (pPO == null) ? null :
+               new ReturnedEvent()
+                       .id( pPO.getId() )
+                       .user( pPO.getUser() )
+                       .what( pPO.getWhat() )
+                       .when( pPO.getWhen() )
+                       .where( pPO.getWhere() )
+                       .done( pPO.getDone() )
+                ;
+    }
 }

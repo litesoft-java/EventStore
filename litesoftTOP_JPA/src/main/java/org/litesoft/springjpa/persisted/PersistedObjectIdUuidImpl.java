@@ -14,29 +14,29 @@ import javax.persistence.Version;
 @MappedSuperclass
 public abstract class PersistedObjectIdUuidImpl extends AbstractPersistedObjectIdUuidImpl implements IPersistedObjectIdUuid {
 
-  @Id
-  private String id;
+    @Id
+    private String id;
 
-  @Version
-  private Integer version;
+    @Version
+    private Integer version;
 
-  @Override
-  public String getId() {
-    return id;
-  }
+    @Override
+    public String getId() {
+        return id;
+    }
 
-  @Override
-  public Integer getVersion() {
-    return version;
-  }
+    @Override
+    public Integer getVersion() {
+        return version;
+    }
 
-  @SuppressWarnings("rawtypes")
-  protected void populateAbstract(AbstractBuilder them ) {
-    id = them.getId();
-    version = them.getVersion();
-  }
+    @SuppressWarnings("rawtypes")
+    protected void populateAbstract( AbstractBuilder them ) {
+        id = them.getId();
+        version = them.getVersion();
+    }
 
-  protected void populateIdForInsert() {
-    id = UUID.randomUUID().toString(); // Not Optimal, as real UUIDs rely on system/host data!
-  }
+    protected void populateIdForInsert() {
+        id = UUID.randomUUID().toString(); // Not Optimal, as real UUIDs rely on system/host data!
+    }
 }
