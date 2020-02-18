@@ -17,6 +17,7 @@ import org.litesoft.restish.support.PageData;
 import org.litesoft.restish.support.auth.AuthorizePair;
 import org.springframework.stereotype.Service;
 
+@SuppressWarnings("DuplicatedCode")
 @Service
 public class V01_EventsStoreImpl extends AbstractEventStore implements V01_EventsStore {
   private static final String[] PO_SUPPORTED_FIELDS = {
@@ -39,8 +40,6 @@ public class V01_EventsStoreImpl extends AbstractEventStore implements V01_Event
 
   @Override
   public PageData<ReturnedEvent> latestEvents( AuthorizePair pAuthorizePair, String pUser, int pLimit ) {
-    System.out.println( "V01_EventsStoreImpl.latestEvents: " + pAuthorizePair );
-
     Page<EventLogPO> zEventsPage = firstPage( pAuthorizePair, pUser, pLimit );
 
     List<EventLogPO> zPOs = NotNull.or( zEventsPage.getPOs(), Collections.emptyList() );

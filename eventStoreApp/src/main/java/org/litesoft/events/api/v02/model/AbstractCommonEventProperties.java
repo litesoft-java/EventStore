@@ -21,13 +21,13 @@ public abstract class AbstractCommonEventProperties<T extends AbstractCommonEven
     @JsonProperty("where")
     private String where = null;
 
+    @JsonProperty("done")
+    private Boolean done = null;
+
     public T user(String user) {
         this.user = user;
         return us();
     }
-
-    @JsonProperty("done")
-    private Boolean done = null;
 
     /**
      * Unique (when combined with 'when').

@@ -14,6 +14,7 @@ import org.litesoft.events.exceptions.RestishDuplicateWhenUserException;
 import org.litesoft.events.exceptions.RestishEventNoChangeException;
 import org.litesoft.events.services.persistence.persisted.EventLogPO;
 import org.litesoft.events.services.persistence.repos.EventLogRepository;
+import org.litesoft.persisted.NextPageToken;
 import org.litesoft.persisted.POField;
 import org.litesoft.persisted.POMetaData;
 import org.litesoft.persisted.Page;
@@ -55,6 +56,11 @@ public abstract class AbstractEventStore {
     Page<EventLogPO> zPage = (pUser == null) ?
                              mRepository.firstPageAllUsers( pLimit ) :
                              mRepository.firstPageByUser( pUser, pLimit );
+    return zPage;
+  }
+
+  protected Page<EventLogPO> nextPage( AuthorizePair pAuthorizePair, String pNextToken, Integer pLimit ) {
+    Page<EventLogPO> zPage = mRepository.nextPage( new NextPageToken( pNextToken ), pLimit );
     return zPage;
   }
 

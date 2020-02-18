@@ -1,12 +1,17 @@
 package org.litesoft.springjpa.adaptors;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.litesoft.alleviative.validation.Significant;
 import org.litesoft.codecs.text.HexUTF8v1;
 import org.litesoft.codecs.text.StringCodec;
 import org.litesoft.persisted.BackdoorIdGenerationAccessor;
@@ -89,17 +94,27 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
   @Override
   public Page<T> firstPage( int pLimit ) {
     pLimit = normalizeLimit( pLimit );
-    return disconnect( pLimit, mRepository.findFirst( createPageableForNextPage( pLimit ) ) );
+    return disconnect( pLimit,
+                       mRepository.findFirst( createPageableForNextPage( pLimit ) ),
+                       this::encodeStandardNextPageToken );
   }
 
   @Override
-  public Page<T> nextPage( NextPageToken pNextPageToken, int pLimit ) {
-    if ( pNextPageToken == null ) {
-      throw new IllegalArgumentException( "NextPageToken not allowed to be null" );
-    }
-    pLimit = normalizeLimit( pLimit );
-    return disconnect( pLimit, mRepository.findNext( createPageableForNextPage( pLimit ),
-                                                     decodeNextPageToken( pNextPageToken ) ) );
+  public Page<T> nextPage( NextPageToken pNextPageToken, Integer pLimit ) {
+    InternalNPT zInternalNPT = decodeNextPageToken( pNextPageToken );
+    return internalNextPage( zInternalNPT, pLimit );
+  }
+
+  protected Page<T> internalNextPage( InternalNPT pInternalNPT, Integer pLimit ) {
+    int zLimit = normalizeLimit( pLimit, pInternalNPT );
+    return disconnect( zLimit,
+                       mRepository.findNext( createPageableForNextPage( zLimit ),
+                                             pInternalNPT.getLastOrderValue() ),
+                       this::encodeStandardNextPageToken );
+  }
+
+  protected int normalizeLimit( Integer pLimit, InternalNPT pInternalNPT ) {
+    return normalizeLimit( (pLimit != null) ? pLimit : pInternalNPT.getLimit() );
   }
 
   protected int normalizeLimit( int pLimit ) {
@@ -119,7 +134,7 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
     return disconnect( mRepository.save( pEntity ) );
   }
 
-  abstract protected String extractPagedOrderByAttribute( CT pEntityNonNull );
+  abstract protected String extractStandardPagedOrderByAttribute( CT pEntityNonNull );
 
   @SuppressWarnings("unchecked")
   protected Iterable<T> cast( Iterable<CT> pIterable ) {
@@ -173,7 +188,7 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
     return mMetaData.copyAll( pEntity );
   }
 
-  protected Page<T> disconnect( int pLimit, List<CT> pFound ) {
+  protected Page<T> disconnect( int pLimit, List<CT> pFound, NextPageTokenEncoder<ID, CT> pNextPageTokenEncoder ) {
     if ( pFound.isEmpty() ) {
       return Page.empty();
     }
@@ -186,7 +201,7 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
       zPOs.add( disconnect( zLastCT ) );
     }
     return zIterator.hasNext() ?
-           new Page<>( zPOs, encodeNextPageToken( zLastCT ) ) :
+           new Page<>( zPOs, pNextPageTokenEncoder.encodeNextPageToken( pLimit, zLastCT ) ) :
            new Page<>( zPOs );
   }
 
@@ -204,24 +219,118 @@ public abstract class AbstractAdaptorRepository<ID, T extends IPersistedObjectId
     }
   }
 
-  protected String decodeNextPageToken( NextPageToken pNextPageToken ) {
-    String zEncodedToken = pNextPageToken.getEncodedToken();
-    String zAfter = NEXT_PAGE_TOKEN_CODEC.decodeSingle( zEncodedToken );
-    if ( (zAfter == null) || zAfter.isEmpty() ) {
-      throw new IllegalStateException( "Decoded Token '" + zEncodedToken + "' was null or empty" );
+  protected static class InternalNPT {
+    private final String mLastOrderValue;
+    private final int mLimit;
+    private final Map<String, String> mOtherFields = new HashMap<>();
+
+    public InternalNPT( int pLimit, String pLastOrderValue, String... pOtherKeyValue ) {
+      mLimit = pLimit;
+      mLastOrderValue = Significant.orNull( pLastOrderValue );
+      for ( int i = 0; i < pOtherKeyValue.length; ) {
+        String zKey = pOtherKeyValue[i++];
+        internalAdd( zKey, pOtherKeyValue[i++] );
+      }
+      if ( mLastOrderValue == null ) {
+        throw new IllegalArgumentException( "LastOrderValue was insignificant" );
+      }
     }
-    return zAfter;
+
+    private void internalAdd( String pKey, String pValue ) {
+      pKey = Significant.orNull( pKey );
+      if ( pKey == null ) {
+        throw new IllegalArgumentException( "OtherField Key was null or empty" );
+      }
+      mOtherFields.put( pKey, Significant.orNull( pValue ) );
+    }
+
+    public InternalNPT add( String pKey, String pValue ) {
+      internalAdd( pKey, pValue );
+      return this;
+    }
+
+    public String getLastOrderValue() {
+      return mLastOrderValue;
+    }
+
+    public int getLimit() {
+      return mLimit;
+    }
+
+    public Set<String> getOtherFieldKeys() {
+      return new HashSet<>( mOtherFields.keySet() );
+    }
+
+    public String getOtherField( String pKey ) {
+      return mOtherFields.get( pKey );
+    }
+
+    public NextPageToken encode() {
+      List<String> zFields = new ArrayList<>( 2 + (mOtherFields.size() * 2) );
+      zFields.add( mLastOrderValue ); // 0
+      zFields.add( Integer.toString( mLimit ) ); // 1
+      for ( Map.Entry<String, String> zEntry : mOtherFields.entrySet() ) {
+        zFields.add( zEntry.getKey() );
+        zFields.add( zEntry.getValue() );
+      }
+      return new NextPageToken( NEXT_PAGE_TOKEN_CODEC.encodeMultiple( zFields.toArray( new String[0] ) ) );
+    }
+
+    public static InternalNPT from( NextPageToken pNextPageToken ) {
+      if ( pNextPageToken == null ) {
+        throw new IllegalStateException( "NextPageToken was null" );
+      }
+      String zEncodedToken = Significant.orNull( pNextPageToken.getEncodedToken() );
+      if ( zEncodedToken == null ) {
+        throw new IllegalStateException( "Encoded Token was null or empty" );
+      }
+      String[] zFields = NEXT_PAGE_TOKEN_CODEC.decodeMultiple( -2, zEncodedToken );
+      String zLastOrderValue = Significant.orNull( zFields[0] );
+      String zLimitStr = Significant.orNull( zFields[1] );
+      if ( zLastOrderValue == null ) {
+        throw new IllegalStateException( "Decoded Token '" + zEncodedToken + "' LastOrderValue was null or empty" );
+      }
+      if ( zLimitStr == null ) {
+        throw new IllegalStateException( "Decoded Token '" + zEncodedToken + "' Limit was null or empty" );
+      }
+      int zLimit;
+      try {
+        zLimit = Integer.parseInt( zLimitStr );
+      }
+      catch ( NumberFormatException e ) {
+        throw new IllegalStateException( "Decoded Token '" + zEncodedToken + "' Limit was not numeric" );
+      }
+      InternalNPT zINPT = new InternalNPT( zLimit, zLastOrderValue );
+      for ( int i = 2; i < zFields.length; ) {
+        String zKey = Significant.orNull( zFields[i++] );
+        String zValue = Significant.orNull( zFields[i++] );
+        if ( zKey == null ) {
+          throw new IllegalStateException( "Decoded Token '" + zEncodedToken + "' OtherFields[" + (i - 2) +
+                                           "] Key was null or empty" );
+        }
+        zINPT.internalAdd( zKey, zValue );
+      }
+      return zINPT;
+    }
   }
 
-  protected NextPageToken encodeNextPageToken( CT pLastCT ) {
+  protected interface NextPageTokenEncoder<ID, CT extends IPersistedObjectId<ID>> {
+    NextPageToken encodeNextPageToken( int pLimit, CT pLastCT );
+  }
+
+  protected InternalNPT decodeNextPageToken( NextPageToken pNextPageToken ) {
+    return InternalNPT.from( pNextPageToken );
+  }
+
+  protected NextPageToken encodeStandardNextPageToken( int pLimit, CT pLastCT ) {
     if ( pLastCT == null ) {
       throw new IllegalStateException( "Can't encode Token, No Last: " + mClassCT.getSimpleName() );
     }
-    String zUnencodedLastValue = extractPagedOrderByAttribute( pLastCT );
+    String zUnencodedLastValue = extractStandardPagedOrderByAttribute( pLastCT );
     if ( (zUnencodedLastValue == null) || zUnencodedLastValue.isEmpty() ) {
       throw new IllegalStateException( "Can't encode Token, '" + mClassCT.getSimpleName() +
                                        "' OrderBy attribute has no value: " + pLastCT );
     }
-    return new NextPageToken( NEXT_PAGE_TOKEN_CODEC.encodeSingle( zUnencodedLastValue ) );
+    return new InternalNPT( pLimit, zUnencodedLastValue ).encode();
   }
 }

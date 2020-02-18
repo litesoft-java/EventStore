@@ -54,12 +54,12 @@ public interface IPersistedObjectRepository<ID, T extends IPersistedObjectId<ID>
    * Load the Next Page with a maximum if <code>pLimit</code> results.
    *
    * @param pNextPageToken !null (see @throws)
-   * @param pLimit         if <code>pLimit</code> is not between (inclusive) 1 and 10000, it is treated as 1.
+   * @param pLimit         if null, then use limit encoded in NextPageToken, otherwise if <code>pLimit</code> is not between (inclusive) 1 and 10000, it is treated as 1.
    *
    * @return !null (if the contained <code>NextPageToken</code> is null, then there are no more pages).
    *
    * @throws IllegalArgumentException if the <code>pNextPageToken</code> is null
    */
-  Page<T> nextPage( NextPageToken pNextPageToken, int pLimit )
+  Page<T> nextPage( NextPageToken pNextPageToken, Integer pLimit )
           throws IllegalArgumentException;
 }

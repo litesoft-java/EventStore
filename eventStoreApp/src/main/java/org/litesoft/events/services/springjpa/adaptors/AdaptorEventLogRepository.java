@@ -1,7 +1,6 @@
 package org.litesoft.events.services.springjpa.adaptors;
 
-import java.util.List;
-
+import org.litesoft.alleviative.validation.Significant;
 import org.litesoft.events.services.persistence.locators.EventLogCodeLocator;
 import org.litesoft.events.services.persistence.persisted.EventLogPO;
 import org.litesoft.events.services.persistence.repos.EventLogRepository;
@@ -18,8 +17,6 @@ public class AdaptorEventLogRepository
         extends AbstractAdaptorRepositoryIdUuid<EventLogPO, EventLogPO.Builder, EventLogPOImpl>
         implements EventLogCodeLocator,
                    EventLogRepository {
-  public static final String ALL_USER_INDICATOR = ":All";
-
   private final SpringEventLogRepository mRepository;
 
   public AdaptorEventLogRepository( SpringEventLogRepository pRepository, TransactionalProxy pTransactionalProxy ) {
@@ -28,49 +25,60 @@ public class AdaptorEventLogRepository
   }
 
   @Override
-  protected String extractPagedOrderByAttribute( EventLogPOImpl pEntityNonNull ) {
+  protected String extractStandardPagedOrderByAttribute( EventLogPOImpl pEntityNonNull ) {
     return pEntityNonNull.getOBF();
   }
 
   @Override
   public Page<EventLogPO> firstPageAllUsers( int pLimit ) {
-    pLimit = normalizeLimit( pLimit );
-    return customizeNextPageToken( pLimit, ALL_USER_INDICATOR,
-                                   mRepository.findFirst( createPageableForNextPage( pLimit ) ) );
+    return firstPage( pLimit );
   }
 
   @Override
   public Page<EventLogPO> firstPageByUser( String pUser, int pLimit ) {
+    pUser = Significant.orNull( pUser );
+    if ( pUser == null ) {
+      return firstPageAllUsers( pLimit );
+    }
+
     pLimit = normalizeLimit( pLimit );
-    return customizeNextPageToken( pLimit, pUser,
-                                   mRepository.firstPageByUser( createPageableForNextPage( pLimit ), pUser ) );
+    return disconnect( pLimit,
+                       mRepository.firstPageByUser( createPageableForNextPage( pLimit ), pUser ),
+                       new ByUserNPTokenEncoder( pUser ) );
   }
 
   @Override
-  public Page<EventLogPO> nextPage( NextPageToken pNextPageToken, Integer pLimit )
-          throws IllegalArgumentException {
-    if ( pNextPageToken == null ) {
-      throw new IllegalArgumentException( "NextPageToken not allowed to be null" );
+  public Page<EventLogPO> nextPage( NextPageToken pNextPageToken, Integer pLimit ) {
+    InternalNPT zInternalNPT = decodeNextPageToken( pNextPageToken );
+    String zUser = zInternalNPT.getOtherField( "User" );
+    if ( zUser == null ) {
+      return internalNextPage( zInternalNPT, pLimit );
     }
-    String zBefore = decodeNextPageToken( pNextPageToken );
-    if ( pLimit == null ) {
-      pLimit = zBefore.length(); // TODO: XXX Totally Bugus!  Customized the NextPageToken
-    }
-    pLimit = normalizeLimit( pLimit );
 
-    List<EventLogPOImpl> zEventLogs;
-    if ( zBefore.startsWith( ALL_USER_INDICATOR ) ) { // TODO: XXX Totally Bugus!  Customized the NextPageToken
-      zEventLogs = mRepository.findNext( createPageableForNextPage( pLimit ),
-                                         zBefore );
-    } else {
-      zEventLogs = mRepository.nextPageByUser( createPageableForNextPage( pLimit ),
-                                               "Some User", // TODO: XXX Totally Bugus!  Customized the NextPageToken
-                                               zBefore );
-    }
-    return disconnect( pLimit, zEventLogs );
+    int zLimit = normalizeLimit( pLimit, zInternalNPT );
+    return disconnect( zLimit,
+                       mRepository.nextPageByUser( createPageableForNextPage( zLimit ), zUser,
+                                                   zInternalNPT.getLastOrderValue() ),
+                       new ByUserNPTokenEncoder( zUser ) );
   }
 
-  private Page<EventLogPO> customizeNextPageToken( int pLimit, String pUser, List<EventLogPOImpl> pFound ) {
-    return disconnect( pLimit, pFound ); // TODO: Customize the NextPageToken
+  private static class ByUserNPTokenEncoder implements NextPageTokenEncoder<String, EventLogPOImpl> {
+    private final String mUser;
+
+    public ByUserNPTokenEncoder( String pUser ) {
+      mUser = pUser;
+    }
+
+    @Override
+    public NextPageToken encodeNextPageToken( int pLimit, EventLogPOImpl pLastCT ) {
+      if ( pLastCT == null ) {
+        throw new IllegalStateException( "Can't encode Token, No Last: EventLogPOImpl" );
+      }
+      String zUnencodedLastValue = pLastCT.getWhen();
+      if ( (zUnencodedLastValue == null) || zUnencodedLastValue.isEmpty() ) {
+        throw new IllegalStateException( "Can't encode Token, 'EventLogPOImpl' When attribute has no value: " + pLastCT );
+      }
+      return new InternalNPT( pLimit, zUnencodedLastValue, "User", mUser ).encode();
+    }
   }
 }

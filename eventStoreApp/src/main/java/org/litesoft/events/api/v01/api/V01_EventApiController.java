@@ -23,40 +23,40 @@ import javax.validation.Valid;
 @SuppressWarnings({"unused", "DefaultAnnotationParam", "MVCPathVariableInspection"})
 public class V01_EventApiController extends AbstractRestishController<ReturnedEvent> implements EventApi {
 
-    private static final Logger log = LoggerFactory.getLogger(V01_EventApiController.class);
+  private static final Logger log = LoggerFactory.getLogger( V01_EventApiController.class );
 
-    private final V01_EventsStore mStore;
+  private final V01_EventsStore mStore;
 
-    public V01_EventApiController(Authorization pAuthorization, V01_EventsStore pStore) {
-        super(pAuthorization);
-        mStore = pStore;
-    }
+  public V01_EventApiController( Authorization pAuthorization, V01_EventsStore pStore ) {
+    super( pAuthorization );
+    mStore = pStore;
+  }
 
-    @Override
-    public ResponseEntity<ReturnedEvent> createEvent(@ApiParam(value = "Event to create", required = true)
-                                                     @Valid @RequestBody
-                                                             CreateEvent body) {
-        return process(HttpStatus.CREATED, () -> mStore.createEvent(authorizePair(), body));
-    }
+  @Override
+  public ResponseEntity<ReturnedEvent> createEvent( @ApiParam(value = "Event to create", required = true)
+                                                    @Valid @RequestBody
+                                                            CreateEvent body ) {
+    return process( HttpStatus.CREATED, () -> mStore.createEvent( authorizePair(), body ) );
+  }
 
-    @Override
-    public ResponseEntity<ReturnedEvent> deleteEvent(@ApiParam(value = "", required = true)
-                                                     @PathVariable("id")
-                                                             String id) {
-        return process(() -> mStore.deleteEvent(authorizePair(), id));
-    }
+  @Override
+  public ResponseEntity<ReturnedEvent> deleteEvent( @ApiParam(value = "", required = true)
+                                                    @PathVariable("id")
+                                                            String id ) {
+    return process( () -> mStore.deleteEvent( authorizePair(), id ) );
+  }
 
-    @Override
-    public ResponseEntity<ReturnedEvent> readEvent(@ApiParam(value = "", required = true)
-                                                   @PathVariable("id")
-                                                           String id) {
-        return process(() -> mStore.readEvent(authorizePair(), id));
-    }
+  @Override
+  public ResponseEntity<ReturnedEvent> readEvent( @ApiParam(value = "", required = true)
+                                                  @PathVariable("id")
+                                                          String id ) {
+    return process( () -> mStore.readEvent( authorizePair(), id ) );
+  }
 
-    @Override
-    public ResponseEntity<ReturnedEvent> updateEvent(@ApiParam(value = "Updated Event", required = true)
-                                                     @Valid @RequestBody
-                                                             UpdateEvent body) {
-        return process(() -> mStore.updateEvent(authorizePair(), body));
-    }
+  @Override
+  public ResponseEntity<ReturnedEvent> updateEvent( @ApiParam(value = "Updated Event", required = true)
+                                                    @Valid @RequestBody
+                                                            UpdateEvent body ) {
+    return process( () -> mStore.updateEvent( authorizePair(), body ) );
+  }
 }
