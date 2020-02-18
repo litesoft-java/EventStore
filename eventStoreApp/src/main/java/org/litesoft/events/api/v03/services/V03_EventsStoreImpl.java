@@ -1,64 +1,150 @@
 package org.litesoft.events.api.v03.services;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.litesoft.alleviative.validation.NotNull;
+import org.litesoft.alleviative.validation.Significant;
 import org.litesoft.events.api.v03.model.CreateEvent;
 import org.litesoft.events.api.v03.model.PatchEvent;
 import org.litesoft.events.api.v03.model.ReturnedEvent;
+import org.litesoft.events.services.AbstractEventStore;
+import org.litesoft.events.services.persistence.persisted.EventLogPO;
+import org.litesoft.events.services.persistence.repos.EventLogRepository;
+import org.litesoft.persisted.NextPageToken;
+import org.litesoft.persisted.Page;
 import org.litesoft.restish.support.PageData;
 import org.litesoft.restish.support.auth.AuthorizePair;
+import org.litesoft.restish.support.exceptions.RestishUpdateTokenNotCurrentException;
 import org.springframework.stereotype.Service;
 
+@SuppressWarnings("DuplicatedCode")
 @Service
-public class V03_EventsStoreImpl implements V03_EventsStore {
+public class V03_EventsStoreImpl extends AbstractEventStore implements V03_EventsStore {
 
-    private static final ReturnedEvent E07 = new ReturnedEvent().what("TvlHome")
-            /* . . . . . . . . . . . . . . . . . . */.when("2020-02-07T17:30")
-            .user("george@the.com").id("d290f1ee-6c54-4b02-90e6-d702748f0857");
-    private static final ReturnedEvent E06 = new ReturnedEvent().what("Code")
-            /* . . . . . . . . . . . . . . . . . . */.when("2020-02-07T15:59")
-            .user("george@the.com").id("d290f1ee-6c54-4b02-90e6-d702748f0856");
-    private static final ReturnedEvent E05 = new ReturnedEvent().what("Break")
-            /* . . . . . . . . . . . . . . . . . . */.when("2020-02-07T15:46")
-            .user("george@the.com").id("d290f1ee-6c54-4b02-90e6-d702748f0855");
-    private static final ReturnedEvent E04 = new ReturnedEvent().what("Code")
-            /* . . . . . . . . . . . . . . . . . . */.when("2020-02-07T12:45")
-            .user("george@the.com").id("d290f1ee-6c54-4b02-90e6-d702748f0854");
-    private static final ReturnedEvent E03 = new ReturnedEvent().what("Lunch")
-            /* . . . . . . . . . . . . . . . . . . */.when("2020-02-07T11:15")
-            .user("george@the.com").id("d290f1ee-6c54-4b02-90e6-d702748f0853");
-    private static final ReturnedEvent E02 = new ReturnedEvent().what("Meeting")
-            /* . . . . . . . . . . . . . . . . . . */.when("2020-02-07T08:30")
-            .user("george@the.com").id("d290f1ee-6c54-4b02-90e6-d702748f0852");
-    private static final ReturnedEvent E01 = new ReturnedEvent().what("TvlWork")
-            /* . . . . . . . . . . . . . . . . . . */.when("2020-02-07T07:00")
-            .user("george@the.com").id("d290f1ee-6c54-4b02-90e6-d702748f0851");
+  private static final String[] PO_SUPPORTED_FIELDS = {
+          "User",
+          "What",
+          "When",
+          "Where",
+          "Done",
+          "LocalTimeOffset",
+          "LocalTzName",
+          "Billable",
+          "Client",
+          };
+  private static final String[] API_UNSUPPORTED_FIELDS = {};
 
-    @Override
-    public PageData<ReturnedEvent> latestEvents(AuthorizePair pAuthorizePair, String pUser, int pLimit) {
-        return new PageData<>(E07, E06, E05, E04, E03, E02, E01);
+  public V03_EventsStoreImpl( EventLogRepository pRepository ) {
+    super( "v03", pRepository, EventLogPO.META_DATA, PO_SUPPORTED_FIELDS, API_UNSUPPORTED_FIELDS );
+  }
+
+  @Override
+  public PageData<ReturnedEvent> latestEvents( AuthorizePair pAuthorizePair, String pUser, int pLimit ) {
+    Page<EventLogPO> zPage = firstPage( pAuthorizePair, pUser, pLimit );
+    return map( zPage );
+  }
+
+  @Override
+  public PageData<ReturnedEvent> nextEvents( AuthorizePair pAuthorizePair, String pNextToken, Integer pLimit_inheritIfNull ) {
+    Page<EventLogPO> zPage = nextPage( pAuthorizePair, pNextToken, pLimit_inheritIfNull );
+    return map( zPage );
+  }
+
+  private PageData<ReturnedEvent> map( Page<EventLogPO> zPage ) {
+    List<EventLogPO> zPOs = NotNull.or( zPage.getPOs(), Collections.emptyList() );
+    List<ReturnedEvent> zData = zPOs.stream().map( this::mapPO2RE ).collect( Collectors.toList() );
+
+    NextPageToken zNextPageToken = zPage.getNextPageToken();
+    String zToken = (zNextPageToken == null) ? null : Significant.orNull( zNextPageToken.getEncodedToken() );
+    return new PageData<>( zData, zToken );
+  }
+
+  @Override
+  public ReturnedEvent createEvent( AuthorizePair pAuthorizePair, CreateEvent pEvent ) {
+    if ( pEvent == null ) {
+      return null;
     }
 
-    @Override
-    public PageData<ReturnedEvent> nextEvents(AuthorizePair pAuthorizePair, String pNextToken, Integer pLimit_inheritIfNull) {
-        return new PageData<>();
-    }
+    EventLogPO zPO = EventLogPO.builder()
+            .withUser( pEvent.getUser() )
+            .withWhat( pEvent.getWhat() )
+            .withWhen( pEvent.getWhen() )
+            .withWhere( pEvent.getWhere() )
+            .withDone( pEvent.isDone() )
+            .withLocalTimeOffset( pEvent.getLocalTimeOffset() )
+            .withLocalTzName( pEvent.getLocalTzName() )
+            .withBillable( pEvent.isBillable() )
+            .withClient( pEvent.getClient() )
+            .build();
 
-    @Override
-    public ReturnedEvent createEvent(AuthorizePair pAuthorizePair, CreateEvent pEvent) {
-        return null;
-    }
+    EventLogPO zInsertedPO = mRepository.insert( zPO );
 
-    @Override
-    public ReturnedEvent deleteEvent(AuthorizePair pAuthorizePair, String updateToken) {
-        return null;
-    }
+    return mapPO2RE( zInsertedPO );
+  }
 
-    @Override
-    public ReturnedEvent readEvent(AuthorizePair pAuthorizePair, String pID) {
-        return null;
+  @Override
+  public ReturnedEvent deleteEvent( AuthorizePair pAuthorizePair, String pUpdateToken ) {
+    EventLogPO zPO = getForChangeByUpdateToken( pUpdateToken );
+    if ( zPO != null ) {
+      mRepository.delete( zPO );
     }
+    return mapPO2RE( zPO );
+  }
 
-    @Override
-    public ReturnedEvent updateEvent(AuthorizePair pAuthorizePair, String updateToken, PatchEvent pEvent) {
-        return null;
+  @Override
+  public ReturnedEvent readEvent( AuthorizePair pAuthorizePair, String pID ) {
+    return mapPO2RE( mRepository.findById( Significant.orNull( pID ) ) );
+  }
+
+  @Override
+  public ReturnedEvent updateEvent( AuthorizePair pAuthorizePair, String pUpdateToken, PatchEvent pEvent ) {
+    if ( pEvent == null ) {
+      return null;
     }
+    EventLogPO zPO = getForChangeByUpdateToken( pUpdateToken );
+    if ( zPO == null ) {
+      return null;
+    }
+    String zUser = requiredSignificantField( "User", pEvent.getUser() );
+    String zWhat = requiredSignificantField( "What", pEvent.getWhat() );
+    String zWhen = requiredSignificantField( "When", pEvent.getWhen() );
+    String zWhere = Significant.orNull( pEvent.getWhere() );
+    Boolean zDone = pEvent.isDone();
+    Integer zLocalTimeOffset = pEvent.getLocalTimeOffset();
+    String zLocalTzName = Significant.orNull( pEvent.getLocalTzName() );
+    Boolean zBillable = pEvent.isBillable();
+    String zClient = Significant.orNull( pEvent.getClient() );
+
+    EventLogPO.Builder zBuilder = checkUpdateApiBasedChanges( pEvent.getId(),
+                                                              "User", zUser,
+                                                              "What", zWhat,
+                                                              "When", zWhen,
+                                                              "Where", zWhere,
+                                                              "Done", zDone,
+                                                              "LocalTimeOffset", zLocalTimeOffset,
+                                                              "LocalTzName", zLocalTzName,
+                                                              "Billable", zBillable,
+                                                              "Client", zClient );
+    EventLogPO zUpdated = update( zBuilder );
+    return mapPO2RE( zUpdated );
+  }
+
+  private ReturnedEvent mapPO2RE( EventLogPO pPO ) {
+    return (pPO == null) ? null :
+           new ReturnedEvent()
+                   .id( pPO.getId() )
+                   .user( pPO.getUser() )
+                   .what( pPO.getWhat() )
+                   .when( pPO.getWhen() )
+                   .where( pPO.getWhere() )
+                   .done( pPO.getDone() )
+                   .localTimeOffset( pPO.getLocalTimeOffset() )
+                   .localTzName( pPO.getLocalTzName() )
+                   .billable( pPO.getBillable() )
+                   .client( pPO.getClient() )
+                   .updateToken( encodeUpdateToken( pPO ) )
+            ;
+  }
 }

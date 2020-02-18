@@ -21,7 +21,7 @@ public interface EventLogPO extends EventLogCodeLocator,
           .field( "User", String.class, EventLogPO::getUser, Builder::withUser ) // Significant
           .field( "What", String.class, EventLogPO::getWhat, Builder::withWhat ) // Significant
           .field( "When", String.class, EventLogPO::getWhen, Builder::withWhen ) // Defaulting : Significant
-          .field( "LocalTimeOffset", String.class, EventLogPO::getLocalTimeOffset, Builder::withLocalTimeOffset ) // Defaulting : Significant
+          .field( "LocalTimeOffset", Integer.class, EventLogPO::getLocalTimeOffset, Builder::withLocalTimeOffset ) // Defaulting : Significant
           .field( "LocalTzName", String.class, EventLogPO::getLocalTzName, Builder::withLocalTzName ) // Defaulting : Significant
           .field( "Where", String.class, EventLogPO::getWhere, Builder::withWhere ) // Defaulting : Significant
           .field( "Billable", Boolean.class, EventLogPO::getBillable, Builder::withBillable )
@@ -35,7 +35,7 @@ public interface EventLogPO extends EventLogCodeLocator,
 
   String getWhat();
 
-  String getLocalTimeOffset();
+  Integer getLocalTimeOffset();
 
   String getLocalTzName();
 
@@ -72,7 +72,7 @@ public interface EventLogPO extends EventLogCodeLocator,
     private String mUser;
     private String mWhat;
     private String mWhen; // ISO8601 DateTime to the Minute
-    private String mLocalTimeOffset;
+    private Integer mLocalTimeOffset;
     private String mLocalTzName;
     private String mWhere;
     private Boolean mBillable;
@@ -118,11 +118,11 @@ public interface EventLogPO extends EventLogCodeLocator,
       mWhen = pWhen;
     }
 
-    public String getLocalTimeOffset() {
+    public Integer getLocalTimeOffset() {
       return mLocalTimeOffset;
     }
 
-    public void setLocalTimeOffset( String pLocalTimeOffset ) {
+    public void setLocalTimeOffset( Integer pLocalTimeOffset ) {
       mLocalTimeOffset = pLocalTimeOffset;
     }
 
@@ -181,7 +181,7 @@ public interface EventLogPO extends EventLogCodeLocator,
       return this;
     }
 
-    public Builder withLocalTimeOffset( String pLocalTimeOffset ) {
+    public Builder withLocalTimeOffset( Integer pLocalTimeOffset ) {
       setLocalTimeOffset( pLocalTimeOffset );
       return this;
     }

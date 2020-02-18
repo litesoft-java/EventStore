@@ -10,6 +10,9 @@ import java.util.function.Function;
 
 import org.litesoft.alleviative.Cast;
 import org.litesoft.alleviative.validation.Significant;
+import org.litesoft.codecs.UnacceptableEncodingException;
+import org.litesoft.codecs.numeric.Base32Av1;
+import org.litesoft.codecs.text.HexUTF8v1;
 import org.litesoft.events.exceptions.RestishDuplicateWhenUserException;
 import org.litesoft.events.exceptions.RestishEventNoChangeException;
 import org.litesoft.events.services.persistence.persisted.EventLogPO;
@@ -20,9 +23,11 @@ import org.litesoft.persisted.POMetaData;
 import org.litesoft.persisted.Page;
 import org.litesoft.persisted.PersistorConstraintViolationException;
 import org.litesoft.restish.support.auth.AuthorizePair;
+import org.litesoft.restish.support.exceptions.RestishBadParamException;
 import org.litesoft.restish.support.exceptions.RestishException;
 import org.litesoft.restish.support.exceptions.RestishInvalidObjectException;
 import org.litesoft.restish.support.exceptions.RestishUpdateIdNotFoundException;
+import org.litesoft.restish.support.exceptions.RestishUpdateTokenNotCurrentException;
 
 @SuppressWarnings({"UnnecessaryLocalVariable", "unused"})
 public abstract class AbstractEventStore {
@@ -134,5 +139,54 @@ public abstract class AbstractEventStore {
       throw new RestishDuplicateWhenUserException( " " + e.getMessage() );
     }
     return zUpdated;
+  }
+
+  protected EventLogPO getForChangeByUpdateToken( String pUpdateToken ) {
+    UpdateTokenValues zTokenValues = decodeUpdateToken( pUpdateToken );
+    EventLogPO zPO = mRepository.findById( Significant.orNull( zTokenValues.getId() ) );
+    if ( (zPO != null) && !zPO.getVersion().equals( zTokenValues.getVersion() ) ) { // Left to Right!
+      throw new RestishUpdateTokenNotCurrentException();
+    }
+    return zPO;
+  }
+
+  protected static class UpdateTokenValues {
+    private final String mId;
+    private final int mVersion;
+
+    public UpdateTokenValues( String pId, int pVersion ) {
+      mId = pId;
+      mVersion = pVersion;
+    }
+
+    public String getId() {
+      return mId;
+    }
+
+    public int getVersion() {
+      return mVersion;
+    }
+  }
+
+  protected String encodeUpdateToken( EventLogPO pPO ) {
+    String zId = Significant.orNull( pPO.getId() );
+    Integer zVersion = pPO.getVersion();
+    if ( (zId == null) || (zVersion == null) ) {
+      throw new IllegalStateException( "EventLog UpdateToken attempted on non-persisted entity" );
+    }
+    return HexUTF8v1.INSTANCE.encodeMultiple( zId, // 0
+                                              Integer.toString( zVersion ) ); // 1
+  }
+
+  protected UpdateTokenValues decodeUpdateToken( String pUpdateToken ) {
+    try {
+      String[] zValues = HexUTF8v1.INSTANCE.decodeMultiple( 2, pUpdateToken );
+      String zId = zValues[0];
+      int zVersion = Integer.parseInt( zValues[1] );
+      return new UpdateTokenValues( zId, zVersion );
+    }
+    catch ( UnacceptableEncodingException | NumberFormatException e ) {
+      throw new RestishBadParamException( " - Update Token: " + e.getMessage() );
+    }
   }
 }

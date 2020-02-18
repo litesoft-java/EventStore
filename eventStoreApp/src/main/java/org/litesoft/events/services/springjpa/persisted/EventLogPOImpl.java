@@ -1,14 +1,13 @@
 package org.litesoft.events.services.springjpa.persisted;
 
 import java.time.Instant;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import org.litesoft.events.services.persistence.locators.EventLogCodeLocator;
 import org.litesoft.events.services.persistence.persisted.EventLogPO;
 import org.litesoft.springjpa.persisted.PersistedObjectIdUuidImpl;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @SuppressWarnings({"unused", "WeakerAccess", "rawtypes", "JpaDataSourceORMInspection"})
 @Entity
@@ -26,7 +25,7 @@ public class EventLogPOImpl extends PersistedObjectIdUuidImpl implements EventLo
   @Column(name = "ts_when")
   private String when; // ISO8601 DateTime to the Minute
   @Column(name = "lcl_time_offset")
-  private String localTimeOffset;
+  private Integer localTimeOffset;
   @Column(name = "lcl_tz_name")
   private String localTzName;
   @Column(name = "lcl_where")
@@ -61,7 +60,7 @@ public class EventLogPOImpl extends PersistedObjectIdUuidImpl implements EventLo
   }
 
   @Override
-  public String getLocalTimeOffset() {
+  public Integer getLocalTimeOffset() {
     return localTimeOffset;
   }
 
@@ -100,7 +99,7 @@ public class EventLogPOImpl extends PersistedObjectIdUuidImpl implements EventLo
     user = requiredEmail( "User", them.getUser() );
     what = requiredSignificant( "What", them.getWhat() );
     when = requiredISO8601Min( "When", them.getWhen(), Instant::now );
-    localTimeOffset = significantOr( them.getLocalTimeOffset(), null );
+    localTimeOffset = them.getLocalTimeOffset();
     localTzName = significantOr( them.getLocalTzName(), null );
     where = significantOr( them.getWhere(), null );
     billable = them.getBillable();
