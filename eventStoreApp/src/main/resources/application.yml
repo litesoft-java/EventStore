@@ -2,10 +2,6 @@ server:
   port: 8080
 
 spring:
-  jackson:
-    date-format: org.litesoft.swagger.RFC3339DateFormat
-    serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
   jpa:
     hibernate:
       ddl-auto: update

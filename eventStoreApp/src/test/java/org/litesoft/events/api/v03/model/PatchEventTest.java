@@ -1,5 +1,9 @@
 package org.litesoft.events.api.v03.model;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.litesoft.accessors.NamedFunction;
@@ -7,6 +11,7 @@ import org.litesoft.alleviative.beans.SetValue;
 
 import static org.junit.Assert.*;
 
+@SuppressWarnings("unchecked")
 public class PatchEventTest {
 
     @Test
@@ -20,19 +25,20 @@ public class PatchEventTest {
 
         String zJson = zMapper.writeValueAsString( zDTO );
 
-        assertEquals( "{" +
-                      "\"id\":null," +
-                      "\"updateToken\":null," +
-                      "\"user\":null," +
-                      "\"what\":null," +
-                      "\"when\":null," +
-                      "\"localTimeOffset\":null," +
-                      "\"localTzName\":null," +
-                      "\"where\":null," +
-                      "\"billable\":null," +
-                      "\"client\":null," +
-                      "\"done\":null" +
-                      "}", zJson );
+        Map<String, ?> zMap = zMapper.readValue( zJson, HashMap.class );
+
+        assertMapHasNullsForOnly( zMap,
+                                  zMD.nfId(),
+                                  zMD.nfUpdateToken(),
+                                  zMD.nfUser(),
+                                  zMD.nfWhat(),
+                                  zMD.nfWhen(),
+                                  zMD.nfLocalTimeOffset(),
+                                  zMD.nfLocalTzName(),
+                                  zMD.nfWhere(),
+                                  zMD.nfBillable(),
+                                  zMD.nfClient(),
+                                  zMD.nfDone() );
 
         PatchEvent zDTO_RT = zMapper.readValue( zJson, PatchEvent.class );
 
@@ -68,6 +74,17 @@ public class PatchEventTest {
         assertNotSet( zDTO_RT, zMD.nfBillable(), zDTO_RT.getBillable(), zDTO_RT.onBillable() );
         assertNotSet( zDTO_RT, zMD.nfClient(), zDTO_RT.getClient(), zDTO_RT.onClient() );
         assertNotSet( zDTO_RT, zMD.nfDone(), zDTO_RT.getDone(), zDTO_RT.onDone() );
+    }
+
+    @SafeVarargs
+    private final void assertMapHasNullsForOnly( Map<String, ?> pMap, NamedFunction<PatchEvent>... pNFs ) {
+        Set<String> zKeys = pMap.keySet();
+        assertEquals( pNFs.length, zKeys.size() );
+        for ( NamedFunction<PatchEvent> zNF : pNFs ) {
+            String zName = zNF.getName();
+            assertTrue( zName, zKeys.contains( zName ) );
+            assertNull( zName, pMap.get( zName ) );
+        }
     }
 
     @SuppressWarnings("ConstantConditions")

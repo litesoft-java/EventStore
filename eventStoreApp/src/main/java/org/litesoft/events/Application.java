@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class Application {
-    private static final String VERSION = "2020-02-16";
+    private static final String VERSION = "2020-02-18";
 
     public static void main( String[] args ) {
         SpringApplication.run( Application.class, args );
