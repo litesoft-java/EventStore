@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.litesoft.alleviative.Cast;
+import org.litesoft.alleviative.beans.SetValue;
 import org.litesoft.alleviative.validation.Significant;
 import org.litesoft.codecs.UnacceptableEncodingException;
-import org.litesoft.codecs.numeric.Base32Av1;
 import org.litesoft.codecs.text.HexUTF8v1;
 import org.litesoft.events.exceptions.RestishDuplicateWhenUserException;
 import org.litesoft.events.exceptions.RestishEventNoChangeException;
@@ -84,6 +84,97 @@ public abstract class AbstractEventStore {
         throw new RestishInvalidObjectException( "required field '" + pWhat + "' missing or null" );
     }
 
+    protected void verifySameOnUpdate( String pExpected, String pWhat, SetValue<String> pSetValue ) {
+        if ( pSetValue != null ) {
+            String zValue = checkSignificantRequiredFieldChange( pWhat, pSetValue ).get();
+            if ( !pExpected.equals( zValue ) ) {
+                throw new RestishInvalidObjectException( "the '" + pWhat + "' field can NOT be changed! ('" + pExpected +
+                                                         "' was != new '" + zValue + "')" );
+            }
+        }
+    }
+
+    protected SetValue<String> checkSignificantRequiredFieldChange( String pWhat, SetValue<String> pSetValue ) {
+        if ( pSetValue == null ) {
+            return null;
+        }
+        String zValue = pSetValue.get();
+        if ( zValue == null ) {
+            throw new RestishInvalidObjectException( "required field '" + pWhat + "' was null" );
+        }
+        return check( pWhat, pSetValue, zValue, "updated required" );
+    }
+
+    protected SetValue<String> checkSignificantFieldChange( String pWhat, SetValue<String> pSetValue ) {
+        String zValue = (pSetValue == null) ? null : pSetValue.get();
+        if ( zValue == null ) {
+            return pSetValue;
+        }
+        return check( pWhat, pSetValue, zValue, "updated" );
+    }
+
+    private SetValue<String> check( String pWhat, SetValue<String> pSetValue, String pValue, String pErrorPrefix ) {
+        String zTrimmed = Significant.orNull( pValue );
+        if ( pValue.equals( zTrimmed ) ) {
+            return pSetValue;
+        }
+        throw new RestishInvalidObjectException( pErrorPrefix + " field '" + pWhat + "' was either empty or had leading or trailing spaces" );
+    }
+
+    private class ChangeCollector {
+        private final Map<String, Object> mChanges = new HashMap<>();
+
+        public void checkAdd( EventLogPO pPO, String pName, Object pValue ) {
+            if ( !Objects.equals( pValue, mApiSupportedAccessors.get( pName ).getGetter().apply( pPO ) ) ) { // Change!
+                mChanges.put( pName, pValue );
+            }
+        }
+
+        public EventLogPO.Builder complete( EventLogPO pPO ) {
+            if ( mChanges.isEmpty() ) {
+                throw new RestishEventNoChangeException();
+            }
+            for ( Map.Entry<String, Function<EventLogPO, ?>> zEntry : mApiUnsupportedAccessors.entrySet() ) {
+                Object zValue = zEntry.getValue().apply( pPO );
+                if ( zValue != null ) {
+                    throw new RestishException( 451,
+                                                "Api version '" + mApiVersion + "' does not support field '" +
+                                                zEntry.getKey() + "'!  Event probably managed by a subsequent API version." );
+                }
+            }
+            EventLogPO.Builder zBuilder = pPO.toBuilder();
+            for ( Map.Entry<String, Object> zEntry : mChanges.entrySet() ) {
+                String zName = zEntry.getKey();
+                Object zValue = zEntry.getValue();
+                POField<EventLogPO, EventLogPO.Builder, ?> zField = mApiSupportedAccessors.get( zName );
+                if ( zValue != null ) {
+                    if ( zValue.getClass() != zField.getType() ) {
+                        throw new RestishInvalidObjectException( "Field '" + zName +
+                                                                 "' expected type '" + zField.getClass().getSimpleName() +
+                                                                 "', but got: " + zValue.getClass().getSimpleName() );
+                    }
+                }
+                zField.getSetter().apply( zBuilder, Cast.it( zValue ) );
+            }
+
+            return zBuilder;
+        }
+    }
+
+    protected EventLogPO.Builder checkUpdateApiBasedPatches( EventLogPO zPO, Object... pNameSetValuePairs ) {
+        ChangeCollector zChanges = new ChangeCollector();
+        for ( int i = 0; i < pNameSetValuePairs.length; ) {
+            String zName = pNameSetValuePairs[i++].toString();
+            SetValue<?> zSetValue = Cast.it( pNameSetValuePairs[i++] );
+            if ( zSetValue != null ) {
+                Object zValue = zSetValue.get();
+                zChanges.checkAdd( zPO, zName, zValue );
+            }
+        }
+        EventLogPO.Builder zBuilder = zChanges.complete( zPO );
+        return zBuilder;
+    }
+
     protected EventLogPO.Builder checkUpdateApiBasedChanges( String pId, Object... pNameValuePairs ) {
         pId = Significant.orNull( pId );
         if ( pId == null ) {
@@ -94,38 +185,13 @@ public abstract class AbstractEventStore {
         if ( zPO == null ) {
             throw new RestishUpdateIdNotFoundException();
         }
-        boolean zAnyChanges = false;
-        for ( int i = 0; !zAnyChanges && (i < pNameValuePairs.length); ) {
-            String zName = pNameValuePairs[i++].toString();
-            Object zValue = pNameValuePairs[i++];
-            zAnyChanges = !Objects.equals( zValue, mApiSupportedAccessors.get( zName ).getGetter().apply( zPO ) );
-        }
-        if ( !zAnyChanges ) {
-            throw new RestishEventNoChangeException();
-        }
-        for ( Map.Entry<String, Function<EventLogPO, ?>> zEntry : mApiUnsupportedAccessors.entrySet() ) {
-            Object zValue = zEntry.getValue().apply( zPO );
-            if ( zValue != null ) {
-                throw new RestishException( 451,
-                                            "Api version '" + mApiVersion + "' does not support field '" +
-                                            zEntry.getKey() + "'!  Event probably managed by a subsequent API version." );
-            }
-        }
-        EventLogPO.Builder zBuilder = zPO.toBuilder();
+        ChangeCollector zChanges = new ChangeCollector();
         for ( int i = 0; i < pNameValuePairs.length; ) {
             String zName = pNameValuePairs[i++].toString();
             Object zValue = pNameValuePairs[i++];
-            POField<EventLogPO, EventLogPO.Builder, ?> zField = mApiSupportedAccessors.get( zName );
-            if ( zValue != null ) {
-                if ( zValue.getClass() != zField.getType() ) {
-                    throw new RestishInvalidObjectException( "Field '" + zName +
-                                                             "' expected type '" + zField.getClass().getSimpleName() +
-                                                             "', but got: " + zValue.getClass().getSimpleName() );
-                }
-            }
-            zField.getSetter().apply( zBuilder, Cast.it( zValue ) );
+            zChanges.checkAdd( zPO, zName, zValue );
         }
-
+        EventLogPO.Builder zBuilder = zChanges.complete( zPO );
         return zBuilder;
     }
 

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.litesoft.alleviative.beans.SetValue;
 import org.litesoft.alleviative.validation.NotNull;
 import org.litesoft.alleviative.validation.Significant;
 import org.litesoft.events.api.v03.model.CreateEvent;
@@ -106,17 +107,20 @@ public class V03_EventsStoreImpl extends AbstractEventStore implements V03_Event
         if ( zPO == null ) {
             return null;
         }
-        String zUser = requiredSignificantField( "User", pEvent.getUser() );
-        String zWhat = requiredSignificantField( "What", pEvent.getWhat() );
-        String zWhen = requiredSignificantField( "When", pEvent.getWhen() );
-        String zWhere = Significant.orNull( pEvent.getWhere() );
-        Boolean zDone = pEvent.getDone();
-        Integer zLocalTimeOffset = pEvent.getLocalTimeOffset();
-        String zLocalTzName = Significant.orNull( pEvent.getLocalTzName() );
-        Boolean zBillable = pEvent.getBillable();
-        String zClient = Significant.orNull( pEvent.getClient() );
 
-        EventLogPO.Builder zBuilder = checkUpdateApiBasedChanges( pEvent.getId(),
+        verifySameOnUpdate(zPO.getId(), "Id", pEvent.onId() );
+        verifySameOnUpdate(pUpdateToken, "UpdateToken", pEvent.onUpdateToken() );
+        SetValue<String> zUser = checkSignificantRequiredFieldChange( "User", pEvent.onUser() );
+        SetValue<String> zWhat = checkSignificantRequiredFieldChange( "What", pEvent.onWhat() );
+        SetValue<String> zWhen = checkSignificantRequiredFieldChange( "When", pEvent.onWhen() );
+        SetValue<String> zWhere = checkSignificantFieldChange( "Where", pEvent.onWhere() );
+        SetValue<Boolean> zDone = pEvent.onDone();
+        SetValue<Integer> zLocalTimeOffset = pEvent.onLocalTimeOffset();
+        SetValue<String> zLocalTzName = checkSignificantFieldChange( "LocalTzName", pEvent.onLocalTzName() );
+        SetValue<Boolean> zBillable = pEvent.onBillable();
+        SetValue<String> zClient = checkSignificantFieldChange( "Client", pEvent.onClient() );
+
+        EventLogPO.Builder zBuilder = checkUpdateApiBasedPatches( zPO,
                                                                   "User", zUser,
                                                                   "What", zWhat,
                                                                   "When", zWhen,
