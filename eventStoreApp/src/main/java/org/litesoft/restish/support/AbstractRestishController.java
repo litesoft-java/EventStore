@@ -3,6 +3,7 @@ package org.litesoft.restish.support;
 import java.util.function.Supplier;
 
 import org.litesoft.HttpStatusAccessor;
+import org.litesoft.persisted.PersistorConstraintViolationException;
 import org.litesoft.restish.support.auth.Authorization;
 import org.litesoft.restish.support.auth.AuthorizePair;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +41,10 @@ public class AbstractRestishController<T> {
     protected static <T> ResponseEntity<T> handle( RuntimeException e ) {
         if ( e instanceof HttpStatusAccessor ) {
             int httpStatus = ((HttpStatusAccessor)e).httpStatus();
+            return error( httpStatus, e.getMessage() );
+        }
+        if ( e instanceof PersistorConstraintViolationException ) {
+            int httpStatus = 409;
             return error( httpStatus, e.getMessage() );
         }
         throw e;
